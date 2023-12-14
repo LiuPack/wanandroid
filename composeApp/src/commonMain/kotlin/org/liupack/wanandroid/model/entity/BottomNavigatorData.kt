@@ -9,19 +9,12 @@ import androidx.compose.material.icons.outlined.ViewKanban
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.liupack.wanandroid.router.Router
 
-data class BottomNavigatorData(
-    val icon: ImageVector,
-    val label: String,
-    val router: Router
-) {
-    companion object {
+sealed class BottomNavigatorData(val icon: ImageVector, val label: String, val router: Router) {
+    data object Home : BottomNavigatorData(Icons.Outlined.Home, "首页", Router.Home)
+    data object System : BottomNavigatorData(Icons.Outlined.ViewKanban, "体系", Router.System)
+    data object WechatAccount :
+        BottomNavigatorData(Icons.Outlined.LibraryBooks, "公众号", Router.WechatAccount)
 
-        val defaultList = listOf(
-            BottomNavigatorData(Icons.Outlined.Home, "首页", Router.Home),
-            BottomNavigatorData(Icons.Outlined.ViewKanban, "体系", Router.Home),
-            BottomNavigatorData(Icons.Outlined.LibraryBooks, "公众号", Router.Home),
-            BottomNavigatorData(Icons.Outlined.Book, "项目", Router.Home),
-            BottomNavigatorData(Icons.Outlined.Person, "我的", Router.Home)
-        )
-    }
+    data object Project : BottomNavigatorData(Icons.Outlined.Book, "项目", Router.Project)
+    data object User : BottomNavigatorData(Icons.Outlined.Person, "我的", Router.User)
 }

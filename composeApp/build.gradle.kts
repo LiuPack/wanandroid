@@ -58,6 +58,7 @@ kotlin {
             implementation(libs.precompose.viewmodel)
             implementation(libs.precompose.koin)
             implementation(libs.composeIcons.feather)
+            implementation(libs.lt.compose.views)
         }
 
         commonTest.dependencies {

@@ -20,6 +20,7 @@ sqlDelight = "2.0.1"
 statelyCommon = "2.0.6"
 koinCompose = "1.1.1-RC1"
 composeIcons = "1.1.0"
+composeViews = "1.5.10.1"
 
 [libraries]
 
@@ -50,6 +51,7 @@ sqlDelight-driver-android = { module = "app.cash.sqldelight:android-driver", ver
 sqlDelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
 composeIcons-feather = { module = "br.com.devsrsouza.compose.icons:feather", version.ref = "composeIcons" }
+lt-compose-views = { module = "io.github.ltttttttttttt:ComposeViews", version.ref = "composeViews" }
 
 [plugins]
 
