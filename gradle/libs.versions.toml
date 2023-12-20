@@ -4,7 +4,7 @@ kotlin = "1.9.21"
 agp = "8.2.0"
 compose = "1.5.11"
 androidx-appcompat = "1.6.1"
-androidx-activityCompose = "1.8.1"
+androidx-activityCompose = "1.8.2"
 compose-uitooling = "1.5.4"
 composeImageLoader = "1.7.1"
 napier = "2.6.1"
@@ -16,11 +16,11 @@ multiplatformSettings = "1.1.1"
 koin = "3.5.0"
 pagingComposeCommon = "3.3.0-alpha02-0.4.0"
 precompose = "1.5.8"
-sqlDelight = "2.0.1"
 statelyCommon = "2.0.6"
 koinCompose = "1.1.1-RC1"
-composeIcons = "1.1.0"
 composeViews = "1.5.10.1"
+windowsizeMultiplatform = "0.3.2"
+vkompose = "0.1"
 
 [libraries]
 
@@ -46,12 +46,9 @@ paging-compose-common = { module = "app.cash.paging:paging-compose-common", vers
 precompose = { module = "moe.tlaster:precompose", version.ref = "precompose" }
 precompose-koin = { module = "moe.tlaster:precompose-koin", version.ref = "precompose" }
 precompose-viewmodel = { module = "moe.tlaster:precompose-viewmodel", version.ref = "precompose" }
-sqlDelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqlDelight" }
-sqlDelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
-sqlDelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
-composeIcons-feather = { module = "br.com.devsrsouza.compose.icons:feather", version.ref = "composeIcons" }
 lt-compose-views = { module = "io.github.ltttttttttttt:ComposeViews", version.ref = "composeViews" }
+windowsize-multiplatform = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "windowsizeMultiplatform" }
 
 [plugins]
 
@@ -59,4 +56,4 @@ multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotl
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
+vkompose = { id = "com.vk.vkompose", version.ref = "vkompose" }

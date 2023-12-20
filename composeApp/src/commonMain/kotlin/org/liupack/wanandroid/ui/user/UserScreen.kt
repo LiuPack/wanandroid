@@ -18,12 +18,13 @@ import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.rememberNavigator
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
 import org.liupack.wanandroid.router.Router
 
 @Composable
-fun UserScreen(navigator: Navigator) {
+fun UserScreen(navigator: Navigator = rememberNavigator()) {
     val viewModel = koinViewModel(UserViewModel::class)
     val userInfo by viewModel.userInfo.collectAsState()
     val scope = rememberCoroutineScope()

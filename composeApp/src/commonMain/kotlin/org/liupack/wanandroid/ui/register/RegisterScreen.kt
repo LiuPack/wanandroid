@@ -39,6 +39,7 @@ import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.rememberNavigator
 import org.liupack.wanandroid.composables.LoadingDialog
 import org.liupack.wanandroid.composables.MessageDialog
 import org.liupack.wanandroid.model.UiState
@@ -46,7 +47,7 @@ import org.liupack.wanandroid.router.Router
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(navigator: Navigator) {
+fun RegisterScreen(navigator: Navigator = rememberNavigator()) {
     val viewModel = koinViewModel(RegisterViewModel::class)
     val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -86,7 +87,10 @@ fun RegisterScreen(navigator: Navigator) {
 }
 
 @Composable
-fun RegisterWithState(navigator: Navigator, viewModel: RegisterViewModel) {
+fun RegisterWithState(
+    navigator: Navigator = rememberNavigator(),
+    viewModel: RegisterViewModel = koinViewModel(RegisterViewModel::class)
+) {
     val registerState by viewModel.registerState.collectAsStateWithLifecycle(null)
     registerState?.let { uiState ->
         when (uiState) {
@@ -119,7 +123,7 @@ fun RegisterWithState(navigator: Navigator, viewModel: RegisterViewModel) {
 }
 
 @Composable
-fun RePasswordInput(viewModel: RegisterViewModel) {
+fun RePasswordInput(viewModel: RegisterViewModel = koinViewModel(RegisterViewModel::class)) {
     val password by viewModel.inputRePassword.collectAsStateWithLifecycle()
     var showPassword by remember { mutableStateOf(false) }
     OutlinedTextField(
@@ -152,7 +156,7 @@ fun RePasswordInput(viewModel: RegisterViewModel) {
 }
 
 @Composable
-fun PasswordInput(viewModel: RegisterViewModel) {
+fun PasswordInput(viewModel: RegisterViewModel = koinViewModel(RegisterViewModel::class)) {
     val password by viewModel.inputPassword.collectAsStateWithLifecycle()
     var showPassword by remember { mutableStateOf(false) }
     OutlinedTextField(
@@ -185,7 +189,7 @@ fun PasswordInput(viewModel: RegisterViewModel) {
 }
 
 @Composable
-fun UserNameInput(viewModel: RegisterViewModel) {
+fun UserNameInput(viewModel: RegisterViewModel = koinViewModel(RegisterViewModel::class)) {
     val userName by viewModel.inputUserName.collectAsStateWithLifecycle()
     OutlinedTextField(
         value = userName,

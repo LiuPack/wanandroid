@@ -1,9 +1,11 @@
 package org.liupack.wanandroid.model.entity
 
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
+@Stable
 @Serializable
 data class HomeArticleItemData(
     @SerialName("adminAdd")
@@ -35,7 +37,7 @@ data class HomeArticleItemData(
     @SerialName("host")
     val host: String?,
     @SerialName("id")
-    val id: Int?,
+    val id: Int,
     @SerialName("isAdminAdd")
     val isAdminAdd: Boolean?,
     @SerialName("link")

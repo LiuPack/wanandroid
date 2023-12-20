@@ -5,7 +5,24 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.sqlDelight)
+    alias(libs.plugins.vkompose)
+}
+
+vkompose {
+    skippabilityCheck = true
+
+    recompose {
+        isHighlighterEnabled = true
+        isLoggerEnabled = true
+    }
+
+    testTag {
+        isApplierEnabled = true
+        isDrawerEnabled = false
+        isCleanerEnabled = false
+    }
+
+    sourceInformationClean = true
 }
 
 kotlin {
@@ -57,8 +74,8 @@ kotlin {
             implementation(libs.precompose)
             implementation(libs.precompose.viewmodel)
             implementation(libs.precompose.koin)
-            implementation(libs.composeIcons.feather)
             implementation(libs.lt.compose.views)
+            implementation(libs.windowsize.multiplatform)
         }
 
         commonTest.dependencies {
@@ -71,19 +88,16 @@ kotlin {
             implementation(libs.compose.uitooling)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.sqlDelight.driver.android)
         }
 
         jvmMain.dependencies {
             implementation(compose.desktop.common)
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.sqlDelight.driver.sqlite)
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
-            implementation(libs.sqlDelight.driver.native)
         }
 
     }
@@ -126,16 +140,6 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.liupack.wanandroid.desktopApp"
             packageVersion = "1.0.0"
-        }
-    }
-}
-
-sqldelight {
-    databases {
-        create("WanDatabase") {
-            // Database configuration here.
-            // https://cashapp.github.io/sqldelight
-            packageName.set("org.liupack.wanandroid.db")
         }
     }
 }

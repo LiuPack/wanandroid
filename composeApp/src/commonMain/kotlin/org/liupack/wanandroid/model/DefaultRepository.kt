@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.liupack.wanandroid.model.datasource.HomeArticleSource
+import org.liupack.wanandroid.model.datasource.ProjectListSource
 import org.liupack.wanandroid.model.entity.BannerData
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
+import org.liupack.wanandroid.model.entity.ProjectSortData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.network.DataResult.Companion.catchData
@@ -67,6 +69,21 @@ class DefaultRepository : Repository {
         return Pager(
             config = PagingConfig(initialLoadSize = 10, pageSize = 20, prefetchDistance = 1),
             pagingSourceFactory = { HomeArticleSource() }
+        ).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun projectSort(): Flow<List<ProjectSortData>> {
+        return flow {
+            val result = connect().get(NetworkConfig.projectSortApi)
+                .dataResultBody<List<ProjectSortData>>().catchData.orEmpty()
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun projectListFromSort(id: Int): Flow<PagingData<HomeArticleItemData>> {
+        return Pager(
+            config = PagingConfig(initialLoadSize = 10, pageSize = 20, prefetchDistance = 1),
+            pagingSourceFactory = { ProjectListSource(id) }
         ).flow.flowOn(Dispatchers.IO)
     }
 }

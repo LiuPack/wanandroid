@@ -19,4 +19,13 @@ object NetworkConfig {
 
     const val bannerApi = "banner/json"
 
+    const val articleApi = "article/list/{page}/json"
+
+    const val projectSortApi = "project/tree/json"
+
+    const val projectListApi = "project/list/{page}/json"
+
+    internal fun String.replaceRealPageApi(page: Int): String {
+        return this.replace("{page}", page.toString())
+    }
 }

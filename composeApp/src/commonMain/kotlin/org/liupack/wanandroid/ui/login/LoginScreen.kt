@@ -29,13 +29,14 @@ import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.rememberNavigator
 import org.liupack.wanandroid.composables.LoadingDialog
 import org.liupack.wanandroid.composables.MessageDialog
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.router.Router
 
 @Composable
-fun LoginScreen(navigator: Navigator) {
+fun LoginScreen(navigator: Navigator = rememberNavigator()) {
     val viewModel = koinViewModel(LoginViewModel::class)
     Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
         Column(
@@ -72,7 +73,10 @@ fun LoginScreen(navigator: Navigator) {
 }
 
 @Composable
-private fun LoginWithState(navigator: Navigator, viewModel: LoginViewModel) {
+private fun LoginWithState(
+    navigator: Navigator = rememberNavigator(),
+    viewModel: LoginViewModel = koinViewModel(LoginViewModel::class)
+) {
     val loginState by viewModel.loginState.collectAsState(null)
     loginState?.let { uiState ->
         when (uiState) {
@@ -111,7 +115,7 @@ private fun LoginWithState(navigator: Navigator, viewModel: LoginViewModel) {
 
 
 @Composable
-private fun UserNameInput(viewModel: LoginViewModel) {
+private fun UserNameInput(viewModel: LoginViewModel = koinViewModel(LoginViewModel::class)) {
     val userName by viewModel.userNameInput.collectAsStateWithLifecycle()
     OutlinedTextField(
         value = userName,
@@ -133,7 +137,7 @@ private fun UserNameInput(viewModel: LoginViewModel) {
 }
 
 @Composable
-private fun PasswordInput(viewModel: LoginViewModel) {
+private fun PasswordInput(viewModel: LoginViewModel = koinViewModel(LoginViewModel::class)) {
     val password by viewModel.passwordInput.collectAsStateWithLifecycle()
     OutlinedTextField(
         value = password,

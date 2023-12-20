@@ -6,6 +6,7 @@ import org.liupack.wanandroid.model.Repository
 import org.liupack.wanandroid.ui.home.HomeViewModel
 import org.liupack.wanandroid.ui.login.LoginViewModel
 import org.liupack.wanandroid.ui.main.MainViewModel
+import org.liupack.wanandroid.ui.project.ProjectListViewModel
 import org.liupack.wanandroid.ui.project.ProjectViewModel
 import org.liupack.wanandroid.ui.register.RegisterViewModel
 import org.liupack.wanandroid.ui.system.SystemViewModel
@@ -22,4 +23,5 @@ val appModule = module {
     factory { WechatAccountViewModel(get()) }
     factory { ProjectViewModel(get()) }
     factory { UserViewModel(get()) }
+    factory { ProjectListViewModel(get()) }
 }
