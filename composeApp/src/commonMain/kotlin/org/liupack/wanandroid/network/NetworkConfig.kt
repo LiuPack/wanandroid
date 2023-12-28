@@ -25,6 +25,9 @@ object NetworkConfig {
 
     const val projectListApi = "project/list/{page}/json"
 
+    const val systemBaseApi = "tree/json"
+
+
     internal fun String.replaceRealPageApi(page: Int): String {
         return this.replace("{page}", page.toString())
     }

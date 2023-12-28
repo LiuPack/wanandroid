@@ -33,7 +33,7 @@ data class HomeArticleItemData(
     @SerialName("envelopePic")
     val envelopePic: String?,
     @SerialName("fresh")
-    val fresh: Boolean?,
+    val fresh: Boolean,
     @SerialName("host")
     val host: String?,
     @SerialName("id")

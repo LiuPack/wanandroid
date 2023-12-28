@@ -16,6 +16,7 @@ import org.liupack.wanandroid.model.datasource.ProjectListSource
 import org.liupack.wanandroid.model.entity.BannerData
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.model.entity.ProjectSortData
+import org.liupack.wanandroid.model.entity.SystemBaseData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.network.DataResult.Companion.catchData
@@ -85,5 +86,13 @@ class DefaultRepository : Repository {
             config = PagingConfig(initialLoadSize = 10, pageSize = 20, prefetchDistance = 1),
             pagingSourceFactory = { ProjectListSource(id) }
         ).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun systemBaseList(): Flow<List<SystemBaseData>> {
+        return flow {
+            val result = connect().get(NetworkConfig.systemBaseApi)
+                .dataResultBody<List<SystemBaseData>>().catchData.orEmpty()
+            emit(result)
+        }.flowOn(Dispatchers.IO)
     }
 }

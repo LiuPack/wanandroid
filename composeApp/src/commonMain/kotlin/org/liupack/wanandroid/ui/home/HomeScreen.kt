@@ -1,10 +1,10 @@
 package org.liupack.wanandroid.ui.home
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,149 +24,127 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
-import com.lt.compose_views.image_banner.ImageBanner
-import com.seiko.imageloader.rememberImagePainter
-import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
-import moe.tlaster.precompose.koin.koinViewModel
-import moe.tlaster.precompose.navigation.Navigator
-import moe.tlaster.precompose.navigation.rememberNavigator
+import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.Tab
+import cafe.adriel.voyager.navigator.tab.TabOptions
+import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
-import org.liupack.wanandroid.model.UiState.Companion.successDataOrNull
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen(navigator: Navigator = rememberNavigator()) {
-    val viewModel = koinViewModel(HomeViewModel::class)
-    LaunchedEffect(Unit) {
-        viewModel.dispatch(HomeAction.Refresh)
-    }
-    Scaffold(
-        modifier = Modifier.fillMaxWidth(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("首页")
-                },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.dispatch(HomeAction.OpenGithub)
-                    }, content = {
-                        Icon(imageVector = Icons.Outlined.Public, contentDescription = null)
-                    })
-                },
-            )
-        },
-        content = { paddingValues ->
-            ArticleContent(
-                paddingValues = paddingValues,
-                viewModel = viewModel
-            )
-        },
-    )
-}
+@Stable
+object HomeScreen : Tab {
 
-@Composable
-private fun ArticleContent(
-    paddingValues: PaddingValues,
-    viewModel: HomeViewModel = koinViewModel(HomeViewModel::class),
-) {
-    val articles = viewModel.pagingState.collectAsLazyPagingItems()
-    val bannerState by viewModel.bannerList.collectAsStateWithLifecycle()
-    val lazyListState = if (articles.itemCount > 0) viewModel.lazyListState else LazyListState()
-    PagingFullLoadLayout(pagingState = articles, content = {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-                .padding(paddingValues),
-            state = lazyListState
-        ) {
-            item {
-                val bannerList = bannerState.successDataOrNull.orEmpty()
-                ImageBanner(
-                    bannerList.size,
-                    imageContent = {
-                        Image(
-                            painter = rememberImagePainter(bannerList[index].imagePath.orEmpty()),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    },
-                    indicatorItem = null,
-                    selectIndicatorItem = null,
-                    modifier = Modifier.fillMaxWidth()
+    override val options: TabOptions
+        @Composable
+        get() {
+            val icon = rememberVectorPainter(Icons.Outlined.Home)
+            return remember {
+                TabOptions(
+                    index = 0u,
+                    title = "首页",
+                    icon = icon
                 )
             }
-            items(
-                count = articles.itemCount,
-                key = articles.itemKey { it.id },
-                itemContent = { index ->
-                    articles[index]?.let { ArticleItem(it) }
-                })
-            pagingFooter(articles)
         }
-    })
-}
 
-@Composable
-fun ArticleItem(data: HomeArticleItemData) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+    @Composable
+    override fun Content() {
+        val viewModel = getScreenModel<HomeViewModel>()
+        val articleState = viewModel.articles.collectAsLazyPagingItems()
+        val lazyListState =
+            if (articleState.itemCount > 0) viewModel.lazyListState else rememberLazyListState()
+        HomeScreen(articleState = articleState, lazyListState = lazyListState)
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun HomeScreen(
+        articleState: LazyPagingItems<HomeArticleItemData> = collectAsLazyEmptyPagingItems(),
+        lazyListState: LazyListState,
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(buildAnnotatedString {
-                if (data.fresh == true) {
-                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                        append("新")
+        Scaffold(modifier = Modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(title = { Text("首页") }, actions = {
+                    IconButton(onClick = {}, content = {
+                        Icon(Icons.Outlined.Public, null)
+                    })
+                })
+            }) { paddingValues ->
+            PagingFullLoadLayout(
+                modifier = Modifier.padding(paddingValues).fillMaxSize(), pagingState = articleState
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(12.dp),
+                    state = lazyListState
+                ) {
+                    items(count = articleState.itemCount,
+                        key = articleState.itemKey { it.id },
+                        itemContent = { index ->
+                            val item = articleState[index]
+                            if (item != null) {
+                                HomeArticleItem(data = item)
+                            }
+                        })
+                    pagingFooter(articleState)
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalLayoutApi::class)
+    @Composable
+    private fun HomeArticleItem(data: HomeArticleItemData) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (data.fresh) {
+                    Text(text = "新", modifier = Modifier.padding(8.dp))
+                }
+                Text(data.niceShareDate.orEmpty())
+            }
+            Text(data.title.orEmpty())
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                FlowRow(modifier = Modifier.weight(1f)) {
+                    data.tags?.forEach {
+                        Text(it.name.orEmpty(), fontSize = 10.sp)
                     }
                 }
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
-                    append(data.author ?: data.shareUser ?: "")
-                }
-            }, style = MaterialTheme.typography.titleSmall)
-            Text(
-                data.niceDate.orEmpty(),
-                color = MaterialTheme.colorScheme.outlineVariant,
-                style = MaterialTheme.typography.titleSmall
-            )
-        }
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Text(data.title.orEmpty())
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(data.superChapterName.orEmpty(), style = MaterialTheme.typography.labelSmall)
-            IconButton(onClick = {}, content = {
-                if (data.collect == true) {
-                    Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Outlined.FavoriteBorder, contentDescription = null
-                    )
-                }
-            })
+                Text(data.superChapterName.orEmpty() + "/" + data.chapterName.orEmpty())
+            }
         }
     }
 }
+
+val LocalNavigatorParent: Navigator
+    @Composable
+    get() = LocalNavigator.currentOrThrow.parent ?: LocalNavigator.currentOrThrow
+
+
+

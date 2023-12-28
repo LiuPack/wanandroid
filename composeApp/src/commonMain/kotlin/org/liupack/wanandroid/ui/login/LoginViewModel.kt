@@ -1,6 +1,9 @@
 package org.liupack.wanandroid.ui.login
 
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import io.ktor.util.encodeBase64
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -12,8 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.common.Logger
 import org.liupack.wanandroid.model.Repository
@@ -22,7 +23,7 @@ import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.network.exception.DataResultException
 import org.liupack.wanandroid.platform.settings
 
-class LoginViewModel(private val repository: Repository) : ViewModel() {
+class LoginViewModel(private val repository: Repository) : ScreenModel {
 
     private val mUserNameInput =
         MutableStateFlow(settings.getStringOrNull(Constants.loginUserName).orEmpty())
@@ -36,7 +37,7 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
     val loginState = mLoginState.asSharedFlow()
 
     fun dispatch(action: LoginAction) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             when (action) {
                 is LoginAction.Login -> {
                     login(action.userName, action.password)
@@ -54,7 +55,7 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
     }
 
     private fun login(userName: String, password: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             repository.login(userName, password).onStart {
                 mLoginState.emit(UiState.Loading)
             }.catch {
@@ -74,14 +75,19 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
     }
 
     private fun userNameUpdate(userName: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             mUserNameInput.update { userName }
         }
     }
 
     private fun passwordUpdate(password: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             mPasswordInput.update { password }
         }
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        screenModelScope.cancel()
     }
 }

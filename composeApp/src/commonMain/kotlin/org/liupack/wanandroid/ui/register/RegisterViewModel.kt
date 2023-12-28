@@ -1,6 +1,9 @@
 package org.liupack.wanandroid.ui.register
 
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import io.ktor.util.encodeBase64
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -10,8 +13,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.model.Repository
 import org.liupack.wanandroid.model.UiState
@@ -19,7 +20,7 @@ import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.network.exception.DataResultException
 import org.liupack.wanandroid.platform.settings
 
-class RegisterViewModel(private val repository: Repository) : ViewModel() {
+class RegisterViewModel(private val repository: Repository) : ScreenModel {
 
     private val mInputUserName = MutableStateFlow("")
     val inputUserName = mInputUserName.asStateFlow()
@@ -33,7 +34,7 @@ class RegisterViewModel(private val repository: Repository) : ViewModel() {
     private val mRegisterState = MutableSharedFlow<UiState<UserInfoData?>>()
     val registerState = mRegisterState.asSharedFlow()
     fun dispatch(action: RegisterAction) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             when (action) {
                 is RegisterAction.InputPassword -> {
                     inputPassword(action.password)
@@ -55,7 +56,7 @@ class RegisterViewModel(private val repository: Repository) : ViewModel() {
     }
 
     private fun register(userName: String, password: String, rePassword: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             repository.register(userName, password, rePassword).onStart {
                 mRegisterState.emit(UiState.Loading)
             }.catch {
@@ -74,20 +75,25 @@ class RegisterViewModel(private val repository: Repository) : ViewModel() {
     }
 
     private fun inputUserName(userName: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             mInputUserName.update { userName }
         }
     }
 
     private fun inputRePassword(rePassword: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             mInputRePassword.update { rePassword }
         }
     }
 
     private fun inputPassword(password: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             mInputPassword.update { password }
         }
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        screenModelScope.cancel()
     }
 }
