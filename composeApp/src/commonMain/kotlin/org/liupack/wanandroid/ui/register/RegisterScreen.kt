@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
@@ -39,40 +38,66 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.LoadingDialog
 import org.liupack.wanandroid.composables.MessageDialog
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.UserInfoData
 
 object RegisterScreen : Screen {
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = getScreenModel<RegisterViewModel>()
-        val scrollState = rememberScrollState()
-        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
         val userName by viewModel.inputUserName.collectAsState()
         val password by viewModel.inputPassword.collectAsState()
         val rePassword by viewModel.inputRePassword.collectAsState()
         val registerState by viewModel.registerState.collectAsState(null)
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                MediumTopAppBar(
-                    title = {
-                        Text(text = "注册账号")
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            navigator.pop()
-                        }, content = { Icon(Icons.Outlined.ArrowBack, null) })
-                    },
-                    scrollBehavior = scrollBehavior
+        RegisterContent(back = { navigator.pop() },
+            userName = userName,
+            password = password,
+            rePassword = rePassword,
+            onUserNamChange = { viewModel.dispatch(RegisterAction.InputUserName(it)) },
+            onPasswordChange = { viewModel.dispatch(RegisterAction.InputPassword(it)) },
+            onRePasswordChange = { viewModel.dispatch(RegisterAction.InputRePassword(it)) },
+            registerState = registerState,
+            register = {
+                viewModel.dispatch(
+                    RegisterAction.Register(
+                        userName = viewModel.inputUserName.value,
+                        password = viewModel.inputPassword.value,
+                        rePassword = viewModel.inputRePassword.value
+                    )
                 )
-            }) { paddingValues ->
+            },
+            registerSuccess = {
+                navigator.popUntilRoot()
+            })
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun RegisterContent(
+        back: () -> Unit = {},
+        userName: String,
+        password: String,
+        rePassword: String,
+        onUserNamChange: (String) -> Unit = {},
+        onPasswordChange: (String) -> Unit = {},
+        onRePasswordChange: (String) -> Unit = {},
+        registerState: UiState<UserInfoData?>? = null,
+        register: () -> Unit,
+        registerSuccess: () -> Unit,
+    ) {
+        val scrollState = rememberScrollState()
+        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+            MediumTopAppBar(title = { Text(text = "注册账号") },
+                navigationIcon = { IconBackButton(onClick = back) },
+                scrollBehavior = scrollBehavior
+            )
+        }) { paddingValues ->
             Column(
                 modifier = Modifier.fillMaxSize().padding(paddingValues)
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -85,26 +110,19 @@ object RegisterScreen : Screen {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     UserNameInput(
-                        userName = userName,
-                        onUserNameChange = { viewModel.dispatch(RegisterAction.InputUserName(it)) })
+                        userName = userName, onUserNameChange = onUserNamChange
+                    )
                     PasswordInput(
-                        password = password,
-                        onPasswordChange = { viewModel.dispatch(RegisterAction.InputPassword(it)) })
+                        password = password, onPasswordChange = onPasswordChange
+                    )
                     RePasswordInput(
-                        password = rePassword,
-                        onPasswordChange = { viewModel.dispatch(RegisterAction.InputRePassword(it)) })
+                        password = rePassword, onPasswordChange = onRePasswordChange
+                    )
                     RegisterWithState(
                         registerState = registerState,
-                        navigator = navigator,
-                        register = {
-                            viewModel.dispatch(
-                                RegisterAction.Register(
-                                    userName = viewModel.inputUserName.value,
-                                    password = viewModel.inputPassword.value,
-                                    rePassword = viewModel.inputRePassword.value
-                                )
-                            )
-                        })
+                        register = register,
+                        registerSuccess = registerSuccess
+                    )
                 }
             }
         }
@@ -198,8 +216,8 @@ object RegisterScreen : Screen {
     @Composable
     fun RegisterWithState(
         registerState: UiState<UserInfoData?>? = null,
-        navigator: Navigator = LocalNavigator.currentOrThrow,
         register: () -> Unit,
+        registerSuccess: () -> Unit,
     ) {
         registerState?.let { uiState ->
             when (uiState) {
@@ -216,7 +234,7 @@ object RegisterScreen : Screen {
                 }
 
                 is UiState.Success -> {
-                    navigator.popUntil { true }
+                    registerSuccess.invoke()
                 }
             }
         }

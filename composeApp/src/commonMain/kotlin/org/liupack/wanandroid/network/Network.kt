@@ -10,7 +10,6 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.cookie
-import io.ktor.http.cookies
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.decodeBase64String
 import kotlinx.serialization.json.Json
@@ -34,13 +33,8 @@ object Network {
             val password =
                 settings.getStringOrNull(Constants.loginUserPassword)?.decodeBase64String()
                     .orEmpty()
-            if (userName.isNotEmpty() && password.isNotEmpty()) {
-                cookie(Constants.loginUserName, userName)
-                cookie(Constants.loginUserPassword, password)
-            }
-            cookies().forEach {
-                println("读取 Cookies:$it")
-            }
+            cookie(Constants.loginUserName, userName)
+            cookie(Constants.loginUserPassword, password)
         }
         install(Logging) {
             logger = Logger.SIMPLE

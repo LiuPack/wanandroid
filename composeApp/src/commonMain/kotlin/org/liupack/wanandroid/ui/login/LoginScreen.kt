@@ -3,16 +3,22 @@ package org.liupack.wanandroid.ui.login
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,9 +35,9 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.liupack.wanandroid.common.Logger
+import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.LoadingDialog
 import org.liupack.wanandroid.composables.MessageDialog
 import org.liupack.wanandroid.model.UiState
@@ -45,9 +52,47 @@ object LoginScreen : Screen {
         val viewModel = getScreenModel<LoginViewModel>()
         val userName by viewModel.userNameInput.collectAsState()
         val password by viewModel.passwordInput.collectAsState()
-        Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+        val loginState by viewModel.loginState.collectAsState(null)
+        LoginContent(back = { navigator.pop() },
+            userName = userName,
+            password = password,
+            loginState = loginState,
+            onUserNamChange = {
+                viewModel.dispatch(LoginAction.UserNameInput(it))
+            },
+            onPasswordChange = {
+                viewModel.dispatch(LoginAction.PasswordInput(it))
+            },
+            register = { navigator.push(RegisterScreen) },
+            login = {
+                viewModel.dispatch(LoginAction.Login(userName = userName, password = password))
+            },
+            loginSuccess = { navigator.pop() })
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun LoginContent(
+        back: () -> Unit = {},
+        userName: String,
+        password: String,
+        loginState: UiState<UserInfoData?>?,
+        onUserNamChange: (String) -> Unit = {},
+        onPasswordChange: (String) -> Unit = {},
+        register: () -> Unit = {},
+        login: () -> Unit = {},
+        loginSuccess: () -> Unit = {}
+    ) {
+        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+            MediumTopAppBar(title = { Text("登录") }, navigationIcon = {
+                IconBackButton(onClick = back)
+            }, scrollBehavior = scrollBehavior)
+        }) { paddingValues ->
             Column(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                modifier = Modifier.fillMaxSize().padding(paddingValues)
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Column(
@@ -55,37 +100,28 @@ object LoginScreen : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = "Wan Android",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            brush = Brush.linearGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.secondary,
-                                    MaterialTheme.colorScheme.tertiary
-                                )
-                            ), drawStyle = Stroke(3f)
-                        ),
+                    UserNameInput(userName = userName, onUserNamChange = onUserNamChange)
+                    PasswordInput(password = password, onPasswordChange = onPasswordChange)
+                    LoginWithState(
+                        loginState = loginState, login = login, loginSuccess = loginSuccess
                     )
-                    UserNameInput(userName = userName, onUserNamChange = {
-                        viewModel.dispatch(LoginAction.UserNameInput(it))
-                    })
-                    PasswordInput(password = password, onPasswordChange = {
-                        viewModel.dispatch(LoginAction.PasswordInput(it))
-                    })
-                    LoginWithState(navigator) {
-                        viewModel.dispatch(
-                            LoginAction.Login(
-                                userName = viewModel.userNameInput.value,
-                                password = viewModel.passwordInput.value
-                            )
-                        )
-                    }
-                    TextButton(onClick = {
-                        navigator.push(RegisterScreen)
-                    }, content = { Text("注册账号") })
+                    TextButton(onClick = register, content = { Text("注册账号") })
                 }
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = "Wan Android",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        brush = Brush.linearGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.secondary,
+                                MaterialTheme.colorScheme.tertiary
+                            )
+                        ), drawStyle = Stroke(3f)
+                    ),
+                    modifier = Modifier.padding(vertical = 24.dp)
+                )
             }
         }
     }
@@ -135,9 +171,9 @@ object LoginScreen : Screen {
 
     @Composable
     private fun LoginWithState(
-        navigator: Navigator = LocalNavigator.currentOrThrow,
         loginState: UiState<UserInfoData?>? = null,
         login: () -> Unit,
+        loginSuccess: () -> Unit
     ) {
         loginState?.let { uiState ->
             when (uiState) {
@@ -155,7 +191,7 @@ object LoginScreen : Screen {
 
                 is UiState.Success -> {
                     Logger.i("登录成功")
-                    navigator.pop()
+                    loginSuccess.invoke()
                 }
             }
         }

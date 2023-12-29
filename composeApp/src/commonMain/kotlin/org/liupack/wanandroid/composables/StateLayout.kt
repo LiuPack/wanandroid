@@ -19,6 +19,7 @@ import app.cash.paging.compose.LazyPagingItems
 import org.liupack.wanandroid.common.Logger
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.model.UiState
+import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
 
 @Composable
 fun <T : Any> PagingFullLoadLayout(
@@ -100,14 +101,14 @@ fun <T : Any> LazyListScope.pagingFooter(pagingState: LazyPagingItems<T>) {
 
 
 @Composable
-fun <T : Any> FullUiStateLayout(
+fun <T> FullUiStateLayout(
     modifier: Modifier = Modifier,
     uiState: UiState<T>? = null,
     onRetry: () -> Unit = {},
-    content: @Composable (T) -> Unit
+    content: @Composable BoxScope.(T) -> Unit
 ) {
     if (uiState != null) {
-        when (val state = uiState) {
+        when (uiState) {
             is UiState.Loading -> {
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -115,9 +116,11 @@ fun <T : Any> FullUiStateLayout(
             }
 
             is UiState.Exception -> {
+                val message =
+                    if (uiState.isLoginExpired) "登录过期，请重新登录" else uiState.throwable.message
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Button(onClick = onRetry, content = {
-                        Text("重新加载")
+                        Text(message ?: "重新加载")
                     })
                 }
             }
@@ -132,7 +135,7 @@ fun <T : Any> FullUiStateLayout(
 
             is UiState.Success -> {
                 Box(modifier = modifier.fillMaxSize()) {
-                    content(state.data)
+                    content(uiState.data)
                 }
             }
 

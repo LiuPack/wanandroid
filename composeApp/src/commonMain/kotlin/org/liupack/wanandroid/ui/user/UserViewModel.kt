@@ -3,31 +3,90 @@ package org.liupack.wanandroid.ui.user
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.model.Repository
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.UserFullInfoData
+import org.liupack.wanandroid.model.entity.UserNavigator
 import org.liupack.wanandroid.network.exception.DataResultException
+import org.liupack.wanandroid.platform.settings
 
 class UserViewModel(private val repository: Repository) : ScreenModel {
 
-    private val mUserInfo = MutableStateFlow<UiState<UserFullInfoData?>>(UiState.Loading)
-    val userInfo = mUserInfo.asStateFlow()
+    private val mUserInfoState = MutableStateFlow<UiState<UserFullInfoData?>>(UiState.Loading)
+    val userInfoState = mUserInfoState.asStateFlow()
+    private val mToLogin = MutableSharedFlow<Boolean>()
+    val toLogin = mToLogin.asSharedFlow()
+    private val mToLogout = MutableSharedFlow<UiState<Boolean>>()
+    val logout = mToLogout.asSharedFlow()
 
-    fun userInfo() {
+    val userNavigator = listOf(
+        UserNavigator.UserCoinCount,
+        UserNavigator.UserShared,
+        UserNavigator.UserCollect,
+        UserNavigator.AboutUser,
+        UserNavigator.SystemSetting,
+        UserNavigator.Logout
+    )
+
+    fun dispatch(action: UserAction) {
+        when (action) {
+            UserAction.Login -> {
+                toLogin()
+            }
+
+            UserAction.Logout -> {
+                logout()
+            }
+
+            UserAction.Refresh -> {
+                userInfo()
+            }
+        }
+    }
+
+    private fun toLogin() {
+        screenModelScope.launch {
+            mToLogin.emit(true)
+        }
+    }
+
+    private fun logout() {
+        screenModelScope.launch {
+            repository.logout().onStart {
+                mToLogout.emit(UiState.Loading)
+            }.catch {
+                if (it is DataResultException) {
+                    mToLogout.emit(UiState.Failed(it.message))
+                } else {
+                    mToLogout.emit(UiState.Exception(it))
+                }
+            }.collectLatest {
+                settings.remove(Constants.loginUserName)
+                settings.remove(Constants.loginUserPassword)
+                mToLogout.emit(UiState.Success(true))
+            }
+        }
+    }
+
+    private fun userInfo() {
         screenModelScope.launch {
             repository.userInfo().catch {
                 if (it is DataResultException) {
-                    mUserInfo.emit(UiState.Failed(it.message))
+                    mUserInfoState.emit(UiState.Failed(it.message))
                 } else {
-                    mUserInfo.emit(UiState.Exception(it))
+                    mUserInfoState.emit(UiState.Exception(it))
                 }
             }.collectLatest {
-                mUserInfo.emit(UiState.Success(it))
+                mUserInfoState.emit(UiState.Success(it))
             }
         }
     }

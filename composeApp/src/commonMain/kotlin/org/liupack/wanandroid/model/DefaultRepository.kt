@@ -15,6 +15,7 @@ import org.liupack.wanandroid.model.datasource.HomeArticleSource
 import org.liupack.wanandroid.model.datasource.ProjectListSource
 import org.liupack.wanandroid.model.entity.BannerData
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
+import org.liupack.wanandroid.model.entity.NullData
 import org.liupack.wanandroid.model.entity.ProjectSortData
 import org.liupack.wanandroid.model.entity.SystemBaseData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
@@ -31,6 +32,13 @@ class DefaultRepository : Repository {
                 append("username", userName)
                 append("password", password)
             }).dataResultBody<UserInfoData>().catchData
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun logout(): Flow<NullData?> {
+        return flow {
+            val result = connect().get(NetworkConfig.logoutApi).dataResultBody<NullData>().catchData
             emit(result)
         }.flowOn(Dispatchers.IO)
     }

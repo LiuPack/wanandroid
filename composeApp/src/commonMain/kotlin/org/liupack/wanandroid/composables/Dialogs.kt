@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,33 +26,33 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoadingDialog(isVisibility: Boolean) {
     var isShow by remember { mutableStateOf(isVisibility) }
     if (isVisibility) {
-        AlertDialog(modifier = Modifier.fillMaxWidth(), onDismissRequest = {
+        Dialog(onDismissRequest = {
             isShow = false
         }, content = {
             Box(
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(200.dp)
                     .clip(MaterialTheme.shapes.large)
                     .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.large),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                CircularProgressIndicator(modifier = Modifier.size(50.dp))
             }
         })
     }
 }
 
 @Composable
-fun MessageDialog(isVisibility: Boolean, message: String) {
+fun MessageDialog(isVisibility: Boolean, message: String, hide: () -> Unit = {}) {
     var isShow by remember { mutableStateOf(isVisibility) }
     if (isShow) {
         Dialog(
             onDismissRequest = {
                 isShow = false
+                hide.invoke()
             }, content = {
                 Column(
                     modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large)
@@ -63,10 +61,11 @@ fun MessageDialog(isVisibility: Boolean, message: String) {
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Warning,
+                            imageVector = Icons.Outlined.WarningAmber,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error
                         )
@@ -77,6 +76,7 @@ fun MessageDialog(isVisibility: Boolean, message: String) {
                     }
                     TextButton(onClick = {
                         isShow = false
+                        hide.invoke()
                     }, content = {
                         Text("确认")
                     }, modifier = Modifier.align(Alignment.End))

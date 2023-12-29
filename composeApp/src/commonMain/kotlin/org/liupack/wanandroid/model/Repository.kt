@@ -4,6 +4,7 @@ import app.cash.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import org.liupack.wanandroid.model.entity.BannerData
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
+import org.liupack.wanandroid.model.entity.NullData
 import org.liupack.wanandroid.model.entity.ProjectSortData
 import org.liupack.wanandroid.model.entity.SystemBaseData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
@@ -19,6 +20,13 @@ interface Repository {
      * @return
      */
     fun login(userName: String, password: String): Flow<UserInfoData?>
+
+    /**
+     * 退出登录
+     *
+     * @return
+     */
+    fun logout(): Flow<NullData?>
 
     /**
      * 注册账号

@@ -13,7 +13,7 @@ object NetworkConfig {
 
     const val registerApi = "user/register"
 
-    const val logout = "user/logout/json"
+    const val logoutApi = "user/logout/json"
 
     const val userInfo = "user/lg/userinfo/json"
 

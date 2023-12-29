@@ -6,15 +6,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CoinInfoData(
     @SerialName("coinCount")
-    val coinCount: Int?,
+    val coinCount: Int,
     @SerialName("level")
-    val level: Int?,
+    val level: Int,
     @SerialName("nickname")
-    val nickName: String?,
+    val nickName: String,
     @SerialName("rank")
-    val rank: String?,
+    val rank: String,
     @SerialName("userId")
-    val userId: Int?,
+    val userId: Int,
     @SerialName("username")
-    val userName: String?,
+    val userName: String,
 )
