@@ -40,10 +40,12 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
+import org.liupack.wanandroid.openUrl
 
 @Stable
 object HomeScreen : Tab {
@@ -76,35 +78,47 @@ object HomeScreen : Tab {
         articleState: LazyPagingItems<HomeArticleItemData> = collectAsLazyEmptyPagingItems(),
         lazyListState: LazyListState,
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize(),
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
             topBar = {
-                TopAppBar(title = { Text("首页") }, actions = {
-                    IconButton(onClick = {}, content = {
-                        Icon(Icons.Outlined.Public, null)
-                    })
-                })
-            }) { paddingValues ->
-            PagingFullLoadLayout(
-                modifier = Modifier.padding(paddingValues).fillMaxSize(), pagingState = articleState
-            ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(12.dp),
-                    state = lazyListState
+                TopAppBar(
+                    title = { Text("首页") },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                openUrl(Constants.projectUrl)
+                            },
+                            content = {
+                                Icon(Icons.Outlined.Public, null)
+                            },
+                        )
+                    },
+                )
+            },
+            content = { paddingValues ->
+                PagingFullLoadLayout(
+                    modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+                    pagingState = articleState
                 ) {
-                    items(count = articleState.itemCount,
-                        key = articleState.itemKey { it.id },
-                        itemContent = { index ->
-                            val item = articleState[index]
-                            if (item != null) {
-                                HomeArticleItem(data = item)
-                            }
-                        })
-                    pagingFooter(articleState)
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(12.dp),
+                        state = lazyListState
+                    ) {
+                        items(count = articleState.itemCount,
+                            key = articleState.itemKey { it.id },
+                            itemContent = { index ->
+                                val item = articleState[index]
+                                if (item != null) {
+                                    HomeArticleItem(data = item)
+                                }
+                            })
+                        pagingFooter(articleState)
+                    }
                 }
             }
-        }
+        )
     }
 
     @OptIn(ExperimentalLayoutApi::class)

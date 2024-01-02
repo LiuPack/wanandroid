@@ -67,7 +67,8 @@ object SystemScreen : Tab {
             TopAppBar(title = { Text("知识体系") })
         }, content = { paddingValues ->
             FullUiStateLayout(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                modifier = Modifier.fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding()),
                 uiState = uiState,
                 onRetry = {
                     viewModel.dispatch(SystemAction.Refresh)
