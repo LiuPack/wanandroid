@@ -27,6 +27,10 @@ object NetworkConfig {
 
     const val systemBaseApi = "tree/json"
 
+    const val userCoinCountApi = "lg/coin/userinfo/json"
+
+    const val userCoinCountListApi = "lg/coin/list/{page}/json"
+
 
     internal fun String.replaceRealPageApi(page: Int): String {
         return this.replace("{page}", page.toString())

@@ -7,6 +7,8 @@ import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.model.entity.NullData
 import org.liupack.wanandroid.model.entity.ProjectSortData
 import org.liupack.wanandroid.model.entity.SystemBaseData
+import org.liupack.wanandroid.model.entity.UserCoinCountData
+import org.liupack.wanandroid.model.entity.UserCoinCountListData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserInfoData
 
@@ -80,4 +82,13 @@ interface Repository {
      * @return
      */
     fun systemBaseList(): Flow<List<SystemBaseData>>
+
+    /**
+     * 用户总积分
+     *
+     * @return
+     */
+    fun userCoinCount(): Flow<UserCoinCountData>
+
+    fun userCoinCountList(): Flow<PagingData<UserCoinCountListData>>
 }

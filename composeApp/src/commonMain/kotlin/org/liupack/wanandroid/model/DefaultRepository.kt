@@ -13,11 +13,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.liupack.wanandroid.model.datasource.HomeArticleSource
 import org.liupack.wanandroid.model.datasource.ProjectListSource
+import org.liupack.wanandroid.model.datasource.UserCoinCountListSource
 import org.liupack.wanandroid.model.entity.BannerData
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.model.entity.NullData
 import org.liupack.wanandroid.model.entity.ProjectSortData
 import org.liupack.wanandroid.model.entity.SystemBaseData
+import org.liupack.wanandroid.model.entity.UserCoinCountData
+import org.liupack.wanandroid.model.entity.UserCoinCountListData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.network.DataResult.Companion.catchData
@@ -44,9 +47,7 @@ class DefaultRepository : Repository {
     }
 
     override fun register(
-        userName: String,
-        password: String,
-        rePassword: String
+        userName: String, password: String, rePassword: String
     ): Flow<UserInfoData?> {
         return flow {
             val result = connect().submitForm(NetworkConfig.registerApi, parameters {
@@ -75,10 +76,9 @@ class DefaultRepository : Repository {
     }
 
     override fun articles(): Flow<PagingData<HomeArticleItemData>> {
-        return Pager(
-            config = PagingConfig(initialLoadSize = 10, pageSize = 20, prefetchDistance = 1),
-            pagingSourceFactory = { HomeArticleSource() }
-        ).flow.flowOn(Dispatchers.IO)
+        return Pager(config = PagingConfig(
+            initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
+        ), pagingSourceFactory = { HomeArticleSource() }).flow.flowOn(Dispatchers.IO)
     }
 
     override fun projectSort(): Flow<List<ProjectSortData>> {
@@ -90,10 +90,9 @@ class DefaultRepository : Repository {
     }
 
     override fun projectListFromSort(id: Int): Flow<PagingData<HomeArticleItemData>> {
-        return Pager(
-            config = PagingConfig(initialLoadSize = 10, pageSize = 20, prefetchDistance = 1),
-            pagingSourceFactory = { ProjectListSource(id) }
-        ).flow.flowOn(Dispatchers.IO)
+        return Pager(config = PagingConfig(
+            initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
+        ), pagingSourceFactory = { ProjectListSource(id) }).flow.flowOn(Dispatchers.IO)
     }
 
     override fun systemBaseList(): Flow<List<SystemBaseData>> {
@@ -102,5 +101,19 @@ class DefaultRepository : Repository {
                 .dataResultBody<List<SystemBaseData>>().catchData.orEmpty()
             emit(result)
         }.flowOn(Dispatchers.IO)
+    }
+
+    override fun userCoinCount(): Flow<UserCoinCountData> {
+        return flow {
+            val result = connect().get(NetworkConfig.userCoinCountApi)
+                .dataResultBody<UserCoinCountData>().catchData ?: UserCoinCountData.Empty
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun userCoinCountList(): Flow<PagingData<UserCoinCountListData>> {
+        return Pager(config = PagingConfig(
+            initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
+        ), pagingSourceFactory = { UserCoinCountListSource() }).flow.flowOn(Dispatchers.IO)
     }
 }
