@@ -3,6 +3,7 @@ package org.liupack.wanandroid.model
 import app.cash.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import org.liupack.wanandroid.model.entity.BannerData
+import org.liupack.wanandroid.model.entity.CoinCountRankingData
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.model.entity.NullData
 import org.liupack.wanandroid.model.entity.ProjectSortData
@@ -90,5 +91,17 @@ interface Repository {
      */
     fun userCoinCount(): Flow<UserCoinCountData>
 
+    /**
+     * 用户积分记录
+     *
+     * @return
+     */
     fun userCoinCountList(): Flow<PagingData<UserCoinCountListData>>
+
+    /**
+     * 积分排行榜
+     *
+     * @return
+     */
+    fun coinCountRanking(): Flow<PagingData<CoinCountRankingData>>
 }

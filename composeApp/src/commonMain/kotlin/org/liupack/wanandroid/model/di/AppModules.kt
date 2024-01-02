@@ -3,6 +3,7 @@ package org.liupack.wanandroid.model.di
 import org.koin.dsl.module
 import org.liupack.wanandroid.model.DefaultRepository
 import org.liupack.wanandroid.model.Repository
+import org.liupack.wanandroid.ui.coin_count_ranking.CoinCountRankingViewModel
 import org.liupack.wanandroid.ui.home.HomeViewModel
 import org.liupack.wanandroid.ui.login.LoginViewModel
 import org.liupack.wanandroid.ui.main.MainViewModel
@@ -28,4 +29,5 @@ val appModule = module {
         ProjectListViewModel(id, get())
     }
     factory { UserCoinCountViewModel(get()) }
+    factory { CoinCountRankingViewModel(get()) }
 }

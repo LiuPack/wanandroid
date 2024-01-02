@@ -3,16 +3,23 @@ package org.liupack.wanandroid.ui.user_coincount
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ViewKanban
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +45,8 @@ import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
@@ -44,19 +54,19 @@ import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.UserCoinCountData
 import org.liupack.wanandroid.model.entity.UserCoinCountListData
 import org.liupack.wanandroid.ui.coin_count_ranking.CoinCountRankingScreen
-import org.liupack.wanandroid.ui.home.LocalNavigatorParent
 import kotlin.math.roundToInt
 
 data object UserCoinCountScreen : Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigatorParent
+        val navigator = LocalNavigator.currentOrThrow
         val viewModel = getScreenModel<UserCoinCountViewModel>()
         LaunchedEffect(viewModel) {
             viewModel.dispatch(UserCoinCountAction.Refresh)
         }
+        val refresh by remember { mutableStateOf(false) }
         val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
         val userCoinCountState by viewModel.userCoinCountState.collectAsState()
         val userCoinCountListState = viewModel.userCoinCountList.collectAsLazyPagingItems()
@@ -66,40 +76,51 @@ data object UserCoinCountScreen : Screen {
                 navigator.push(CoinCountRankingScreen)
             }
         }
-        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-            LargeTopAppBar(
-                title = { TitleCoinCount(userCoinCountState) },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.dispatch(UserCoinCountAction.ToRanking)
-                    }, content = {
-                        Icon(
-                            imageVector = Icons.Outlined.ViewKanban,
-                            contentDescription = null,
-                            modifier = Modifier.rotate(180f)
+        val refreshState = rememberPullRefreshState(refreshing = refresh, onRefresh = {
+            viewModel.dispatch(UserCoinCountAction.Refresh)
+            userCoinCountListState.refresh()
+        })
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter, content = {
+            Scaffold(modifier = Modifier.fillMaxSize().pullRefresh(state = refreshState), topBar = {
+                LargeTopAppBar(
+                    title = { TitleCoinCount(userCoinCountState) },
+                    actions = {
+                        IconButton(onClick = {
+                            viewModel.dispatch(UserCoinCountAction.ToRanking)
+                        }, content = {
+                            Icon(
+                                imageVector = Icons.Outlined.ViewKanban,
+                                contentDescription = null,
+                                modifier = Modifier.rotate(180f)
+                            )
+                        })
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    navigationIcon = { IconBackButton(onClick = { navigator.pop() }) },
+                    scrollBehavior = scrollBehavior,
+                )
+            }, content = {
+                PagingFullLoadLayout(
+                    modifier = Modifier.fillMaxSize().padding(it),
+                    pagingState = userCoinCountListState,
+                    content = {
+                        UserCoinCountContent(
+                            modifier = Modifier.fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
+                            userCoinCountList = userCoinCountListState,
                         )
                     })
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                navigationIcon = { IconBackButton(onClick = { navigator.pop() }) },
-                scrollBehavior = scrollBehavior,
+            })
+            PullRefreshIndicator(
+                refreshing = refresh,
+                state = refreshState,
+                modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
             )
-        }, content = {
-            PagingFullLoadLayout(
-                modifier = Modifier.fillMaxSize().padding(it),
-                pagingState = userCoinCountListState,
-                content = {
-                    UserCoinCountContent(
-                        modifier = Modifier.fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
-                        userCoinCountList = userCoinCountListState,
-                    )
-                })
         })
     }
 

@@ -13,7 +13,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-        A93A953729CC810C00F8E227 /* wanandroid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "wanandroid.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A93A953729CC810C00F8E227 /* wanandroid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wanandroid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A93A953A29CC810C00F8E227 /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
 		A93A953E29CC810D00F8E227 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A93A954129CC810D00F8E227 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -36,6 +36,8 @@
 				A93A953929CC810C00F8E227 /* iosApp */,
 				A93A953829CC810C00F8E227 /* Products */,
 				C4127409AE3703430489E7BC /* Frameworks */,
+				D8CF73E7608358163D055B9A /* xcuserdata */,
+				D8CA530000F3D51BD96D43C8 /* lx.xcuserdatad */,
 			);
 			sourceTree = "<group>";
 		};
@@ -70,6 +72,46 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D8C82A96C1A68DD6A497940A /* xcschemes */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = xcschemes;
+			sourceTree = "<group>";
+		};
+		D8C8E28C3635EF5D09D28EDA /* xcschemes */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = xcschemes;
+			sourceTree = "<group>";
+		};
+		D8CA530000F3D51BD96D43C8 /* lx.xcuserdatad */ = {
+			isa = PBXGroup;
+			children = (
+				D8C82A96C1A68DD6A497940A /* xcschemes */,
+			);
+			name = lx.xcuserdatad;
+			path = iosApp.xcodeproj/xcuserdata/lx.xcuserdatad;
+			sourceTree = "<group>";
+		};
+		D8CF03AC9419F87DBEA4F305 /* lx.xcuserdatad */ = {
+			isa = PBXGroup;
+			children = (
+				D8C8E28C3635EF5D09D28EDA /* xcschemes */,
+			);
+			path = lx.xcuserdatad;
+			sourceTree = "<group>";
+		};
+		D8CF73E7608358163D055B9A /* xcuserdata */ = {
+			isa = PBXGroup;
+			children = (
+				D8CF03AC9419F87DBEA4F305 /* lx.xcuserdatad */,
+			);
+			name = xcuserdata;
+			path = iosApp.xcodeproj/project.xcworkspace/xcuserdata;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -292,10 +334,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-                FRAMEWORK_SEARCH_PATHS = (
-    	"${inherited}",
-    	"$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
-    );
+				FRAMEWORK_SEARCH_PATHS = (
+					"${inherited}",
+					"$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -307,13 +349,13 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-                OTHER_LDFLAGS = (
-       	"${inherited}",
-       	"-framework",
-       	ComposeApp,
-       );
+				OTHER_LDFLAGS = (
+					"${inherited}",
+					"-framework",
+					ComposeApp,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.liupack.wanandroid.iosApp;
-				PRODUCT_NAME = "wanandroid";
+				PRODUCT_NAME = wanandroid;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -329,10 +371,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-                FRAMEWORK_SEARCH_PATHS = (
-    	"${inherited}",
-    	"$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
-    );
+				FRAMEWORK_SEARCH_PATHS = (
+					"${inherited}",
+					"$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -344,13 +386,13 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-                OTHER_LDFLAGS = (
-       	"${inherited}",
-       	"-framework",
-       	ComposeApp,
-       );
+				OTHER_LDFLAGS = (
+					"${inherited}",
+					"-framework",
+					ComposeApp,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.liupack.wanandroid.iosApp;
-				PRODUCT_NAME = "wanandroid";
+				PRODUCT_NAME = wanandroid;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
