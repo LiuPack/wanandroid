@@ -1,5 +1,7 @@
 package org.liupack.wanandroid.ui.user_coincount
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -38,9 +41,11 @@ import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
+import org.liupack.wanandroid.model.entity.UserCoinCountData
 import org.liupack.wanandroid.model.entity.UserCoinCountListData
 import org.liupack.wanandroid.ui.coin_count_ranking.CoinCountRankingScreen
 import org.liupack.wanandroid.ui.home.LocalNavigatorParent
+import kotlin.math.roundToInt
 
 data object UserCoinCountScreen : Screen {
 
@@ -63,18 +68,7 @@ data object UserCoinCountScreen : Screen {
         }
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
             LargeTopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(text = "我的积分👉")
-                        Text(
-                            text = userCoinCountState.coinCount.toString(),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                },
+                title = { TitleCoinCount(userCoinCountState) },
                 actions = {
                     IconButton(onClick = {
                         viewModel.dispatch(UserCoinCountAction.ToRanking)
@@ -107,6 +101,27 @@ data object UserCoinCountScreen : Screen {
                     )
                 })
         })
+    }
+
+    @Composable
+    private fun TitleCoinCount(userCoinCountState: UserCoinCountData) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            val animatable = remember { Animatable(0f) }
+            LaunchedEffect(userCoinCountState.coinCount) {
+                animatable.animateTo(
+                    targetValue = userCoinCountState.coinCount.toFloat(),
+                    animationSpec = tween(1000)
+                )
+            }
+            Text(text = "我的积分👉")
+            Text(
+                text = animatable.value.roundToInt().toString(),
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 
     @Composable
