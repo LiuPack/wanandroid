@@ -37,21 +37,20 @@ import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.CoinCountRankingData
+import org.liupack.wanandroid.ui.main.LocalParentNavigator
 
-object CoinCountRankingScreen : Screen {
+data object CoinCountRankingScreen : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalParentNavigator
         val viewModel = getScreenModel<CoinCountRankingViewModel>()
         val coinCountRankingState = viewModel.coinCountRankingState.collectAsLazyPagingItems()
         val refreshing = coinCountRankingState.loadState.refresh is LoadStateLoading

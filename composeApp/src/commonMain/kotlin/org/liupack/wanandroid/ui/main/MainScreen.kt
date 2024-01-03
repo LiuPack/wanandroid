@@ -2,7 +2,6 @@ package org.liupack.wanandroid.ui.main
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -20,24 +19,24 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import org.liupack.wanandroid.ui.home.HomeScreen
-import org.liupack.wanandroid.ui.project.ProjectScreen
-import org.liupack.wanandroid.ui.system.SystemScreen
-import org.liupack.wanandroid.ui.user.UserScreen
-import org.liupack.wanandroid.ui.wechat_account.WechatAccountScreen
+import org.liupack.wanandroid.ui.home.HomeTab
+import org.liupack.wanandroid.ui.project.ProjectTab
+import org.liupack.wanandroid.ui.system.SystemTab
+import org.liupack.wanandroid.ui.user.UserTab
+import org.liupack.wanandroid.ui.wechat_account.WechatAccountTab
 
-@Composable
-fun MainScreen() {
-    Navigator(screen = MainScreen)
-}
 
-object MainScreen : Screen {
+internal val LocalParentNavigator
+    @Composable
+    get() = LocalNavigator.currentOrThrow.parent ?: LocalNavigator.currentOrThrow
+
+data object MainScreen : Screen {
     @Composable
     override fun Content() {
         TabNavigatorContent()
@@ -46,17 +45,7 @@ object MainScreen : Screen {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
     private fun TabNavigatorContent() {
-        TabNavigator(HomeScreen, tabDisposable = {
-            TabDisposable(
-                navigator = it, tabs = listOf(
-                    HomeScreen,
-                    SystemScreen,
-                    WechatAccountScreen,
-                    ProjectScreen,
-                    UserScreen
-                )
-            )
-        }) {
+        TabNavigator(HomeTab) {
             val windowWidthSizeClass = calculateWindowSizeClass()
             when (windowWidthSizeClass.widthSizeClass) {
                 WindowWidthSizeClass.Compact -> {
@@ -65,11 +54,11 @@ object MainScreen : Screen {
                             CurrentTab()
                         }
                         NavigationBar(modifier = Modifier.fillMaxWidth()) {
-                            TabNavigatorItem(HomeScreen)
-                            TabNavigatorItem(SystemScreen)
-                            TabNavigatorItem(WechatAccountScreen)
-                            TabNavigatorItem(ProjectScreen)
-                            TabNavigatorItem(UserScreen)
+                            TabNavigatorItem(HomeTab)
+                            TabNavigatorItem(SystemTab)
+                            TabNavigatorItem(WechatAccountTab)
+                            TabNavigatorItem(ProjectTab)
+                            TabNavigatorItem(UserTab)
                         }
                     }
                 }
@@ -78,11 +67,11 @@ object MainScreen : Screen {
 
                     Row(modifier = Modifier.fillMaxSize()) {
                         NavigationRail(modifier = Modifier.fillMaxHeight()) {
-                            TabNavigatorItem(HomeScreen)
-                            TabNavigatorItem(SystemScreen)
-                            TabNavigatorItem(WechatAccountScreen)
-                            TabNavigatorItem(ProjectScreen)
-                            TabNavigatorItem(UserScreen)
+                            TabNavigatorRailItem(HomeTab)
+                            TabNavigatorRailItem(SystemTab)
+                            TabNavigatorRailItem(WechatAccountTab)
+                            TabNavigatorRailItem(ProjectTab)
+                            TabNavigatorRailItem(UserTab)
                         }
                         Box(modifier = Modifier.weight(1f)) {
                             CurrentTab()
@@ -95,7 +84,7 @@ object MainScreen : Screen {
     }
 
     @Composable
-    private fun ColumnScope.TabNavigatorItem(tab: Tab = HomeScreen) {
+    private fun TabNavigatorRailItem(tab: Tab = HomeTab) {
         val tabNavigator = LocalTabNavigator.current
         NavigationRailItem(
             selected = tabNavigator.current.key == tab.key,
@@ -110,7 +99,7 @@ object MainScreen : Screen {
     }
 
     @Composable
-    private fun RowScope.TabNavigatorItem(tab: Tab = HomeScreen) {
+    private fun RowScope.TabNavigatorItem(tab: Tab = HomeTab) {
         val tabNavigator = LocalTabNavigator.current
         NavigationBarItem(
             selected = tabNavigator.current.key == tab.key,

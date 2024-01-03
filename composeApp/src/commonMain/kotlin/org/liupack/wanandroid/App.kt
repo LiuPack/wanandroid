@@ -1,6 +1,7 @@
 package org.liupack.wanandroid
 
 import androidx.compose.runtime.Composable
+import cafe.adriel.voyager.navigator.Navigator
 import org.koin.compose.KoinApplication
 import org.liupack.wanandroid.model.di.appModule
 import org.liupack.wanandroid.theme.AppTheme
@@ -12,7 +13,7 @@ internal fun App() {
         modules(appModule)
     }, content = {
         AppTheme {
-            MainScreen()
+            Navigator(screen = MainScreen)
         }
     })
 }

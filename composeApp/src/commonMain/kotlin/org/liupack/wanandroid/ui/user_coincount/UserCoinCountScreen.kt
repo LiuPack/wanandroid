@@ -45,8 +45,6 @@ import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
@@ -54,6 +52,7 @@ import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.UserCoinCountData
 import org.liupack.wanandroid.model.entity.UserCoinCountListData
 import org.liupack.wanandroid.ui.coin_count_ranking.CoinCountRankingScreen
+import org.liupack.wanandroid.ui.main.LocalParentNavigator
 import kotlin.math.roundToInt
 
 data object UserCoinCountScreen : Screen {
@@ -61,7 +60,7 @@ data object UserCoinCountScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalParentNavigator
         val viewModel = getScreenModel<UserCoinCountViewModel>()
         LaunchedEffect(viewModel) {
             viewModel.dispatch(UserCoinCountAction.Refresh)

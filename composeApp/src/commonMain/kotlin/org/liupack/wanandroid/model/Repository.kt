@@ -104,4 +104,6 @@ interface Repository {
      * @return
      */
     fun coinCountRanking(): Flow<PagingData<CoinCountRankingData>>
+
+    fun articleInSystem(cid: Int): Flow<PagingData<HomeArticleItemData>>
 }

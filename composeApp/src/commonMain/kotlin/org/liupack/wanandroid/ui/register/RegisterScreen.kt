@@ -37,18 +37,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.LoadingDialog
 import org.liupack.wanandroid.composables.MessageDialog
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.UserInfoData
+import org.liupack.wanandroid.ui.main.LocalParentNavigator
 
-object RegisterScreen : Screen {
+data object RegisterScreen : Screen {
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalParentNavigator
         val viewModel = getScreenModel<RegisterViewModel>()
         val userName by viewModel.inputUserName.collectAsState()
         val password by viewModel.inputPassword.collectAsState()
@@ -93,7 +92,8 @@ object RegisterScreen : Screen {
         val scrollState = rememberScrollState()
         val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-            MediumTopAppBar(title = { Text(text = "注册账号") },
+            MediumTopAppBar(
+                title = { Text(text = "注册账号") },
                 navigationIcon = { IconBackButton(onClick = back) },
                 scrollBehavior = scrollBehavior
             )

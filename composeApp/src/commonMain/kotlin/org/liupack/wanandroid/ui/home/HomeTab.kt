@@ -24,7 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,9 +34,6 @@ import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
 import cafe.adriel.voyager.koin.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import org.liupack.wanandroid.common.Constants
@@ -47,8 +43,7 @@ import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.openUrl
 
-@Stable
-object HomeScreen : Tab {
+data object HomeTab : Tab {
 
     override val options: TabOptions
         @Composable
@@ -155,10 +150,6 @@ object HomeScreen : Tab {
         }
     }
 }
-
-val LocalNavigatorParent: Navigator
-    @Composable
-    get() = LocalNavigator.currentOrThrow.parent ?: LocalNavigator.currentOrThrow
 
 
 

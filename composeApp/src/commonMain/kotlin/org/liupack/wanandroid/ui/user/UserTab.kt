@@ -29,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -54,12 +53,11 @@ import org.liupack.wanandroid.model.UiState.Companion.successDataOrNull
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserNavigator
 import org.liupack.wanandroid.openUrl
-import org.liupack.wanandroid.ui.home.LocalNavigatorParent
 import org.liupack.wanandroid.ui.login.LoginScreen
+import org.liupack.wanandroid.ui.main.LocalParentNavigator
 import org.liupack.wanandroid.ui.user_coincount.UserCoinCountScreen
 
-@Stable
-object UserScreen : Tab {
+data object UserTab : Tab {
 
     override val options: TabOptions
         @Composable get() {
@@ -71,7 +69,7 @@ object UserScreen : Tab {
 
     @Composable
     override fun Content() {
-        val navigator = LocalNavigatorParent
+        val navigator = LocalParentNavigator
         val viewModel = getScreenModel<UserViewModel>()
         val userInfoState by viewModel.userInfoState.collectAsState()
         val loginState by viewModel.toLogin.collectAsState(null)

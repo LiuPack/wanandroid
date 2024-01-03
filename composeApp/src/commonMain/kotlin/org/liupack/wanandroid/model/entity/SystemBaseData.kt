@@ -1,15 +1,17 @@
 package org.liupack.wanandroid.model.entity
 
 
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Stable
 @Serializable
 data class SystemBaseData(
     @SerialName("author")
     val author: String?,
     @SerialName("courseId")
-    val courseId: Int?,
+    val courseId: Int,
     @SerialName("cover")
     val cover: String?,
     @SerialName("desc")
@@ -21,7 +23,7 @@ data class SystemBaseData(
     @SerialName("lisenseLink")
     val lisenseLink: String?,
     @SerialName("name")
-    val name: String?,
+    val name: String,
     @SerialName("order")
     val order: Int?,
     @SerialName("parentChapterId")

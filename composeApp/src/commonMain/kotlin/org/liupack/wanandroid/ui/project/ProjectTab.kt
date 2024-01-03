@@ -32,7 +32,7 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import org.liupack.wanandroid.ui.project.child.ProjectListScreen
 
-object ProjectScreen : Tab {
+data object ProjectTab : Tab {
 
     override val options: TabOptions
         @Composable

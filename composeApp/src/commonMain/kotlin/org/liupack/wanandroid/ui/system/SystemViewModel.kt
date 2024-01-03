@@ -1,5 +1,6 @@
 package org.liupack.wanandroid.ui.system
 
+import androidx.compose.foundation.lazy.LazyListState
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.cancel
@@ -16,9 +17,10 @@ import org.liupack.wanandroid.network.exception.DataResultException
 
 class SystemViewModel(private val repository: Repository) : ScreenModel {
 
+    val lazyListState = LazyListState()
+
     private val mSystemBaseData = MutableStateFlow<UiState<List<SystemBaseData>>>(UiState.Loading)
     val systemBaseData = mSystemBaseData.asStateFlow()
-
 
     fun dispatch(action: SystemAction) {
         screenModelScope.launch {

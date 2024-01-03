@@ -5,24 +5,6 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.vkompose)
-}
-
-vkompose {
-    skippabilityCheck = true
-
-    recompose {
-        isHighlighterEnabled = true
-        isLoggerEnabled = true
-    }
-
-    testTag {
-        isApplierEnabled = true
-        isDrawerEnabled = false
-        isCleanerEnabled = false
-    }
-
-    sourceInformationClean = true
 }
 
 kotlin {

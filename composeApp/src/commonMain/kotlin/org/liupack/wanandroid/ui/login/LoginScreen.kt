@@ -34,21 +34,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import org.liupack.wanandroid.common.Logger
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.LoadingDialog
 import org.liupack.wanandroid.composables.MessageDialog
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.UserInfoData
+import org.liupack.wanandroid.ui.main.LocalParentNavigator
 import org.liupack.wanandroid.ui.register.RegisterScreen
 
-object LoginScreen : Screen {
+data object LoginScreen : Screen {
 
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalParentNavigator
         val viewModel = getScreenModel<LoginViewModel>()
         val userName by viewModel.userNameInput.collectAsState()
         val password by viewModel.passwordInput.collectAsState()
@@ -171,9 +170,7 @@ object LoginScreen : Screen {
 
     @Composable
     private fun LoginWithState(
-        loginState: UiState<UserInfoData?>? = null,
-        login: () -> Unit,
-        loginSuccess: () -> Unit
+        loginState: UiState<UserInfoData?>? = null, login: () -> Unit, loginSuccess: () -> Unit
     ) {
         loginState?.let { uiState ->
             when (uiState) {

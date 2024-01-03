@@ -54,8 +54,10 @@ import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 
-class ProjectListScreen(
-    private val id: Int = 0, private val index: UShort = 0u, private val title: String = ""
+data class ProjectListScreen(
+    private val id: Int = 0,
+    private val index: UShort = 0u,
+    private val title: String = ""
 ) : Tab {
 
     override val key: ScreenKey

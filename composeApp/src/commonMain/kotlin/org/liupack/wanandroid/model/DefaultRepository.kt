@@ -11,6 +11,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import org.liupack.wanandroid.model.datasource.ArticleInSystemSource
 import org.liupack.wanandroid.model.datasource.CoinCountRankingSource
 import org.liupack.wanandroid.model.datasource.HomeArticleSource
 import org.liupack.wanandroid.model.datasource.ProjectListSource
@@ -123,5 +124,11 @@ class DefaultRepository : Repository {
         return Pager(config = PagingConfig(
             initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
         ), pagingSourceFactory = { CoinCountRankingSource() }).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun articleInSystem(cid: Int): Flow<PagingData<HomeArticleItemData>> {
+        return Pager(config = PagingConfig(
+            initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
+        ), pagingSourceFactory = { ArticleInSystemSource(cid) }).flow.flowOn(Dispatchers.IO)
     }
 }
