@@ -8,7 +8,8 @@ sealed class Router(val path: String) {
     data object Splash : Router("/splash")
 
     @Stable
-    data object Main:Router("/main")
+    data object Main : Router("/main")
+
     @Stable
     data object Login : Router("/login")
 

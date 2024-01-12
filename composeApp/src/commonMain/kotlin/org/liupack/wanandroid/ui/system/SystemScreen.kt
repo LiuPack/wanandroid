@@ -2,11 +2,14 @@ package org.liupack.wanandroid.ui.system
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -26,6 +29,8 @@ import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
+import org.liupack.wanandroid.common.RouterKey
+import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.FullUiStateLayout
 import org.liupack.wanandroid.composables.rememberLogger
 import org.liupack.wanandroid.model.UiState
@@ -35,7 +40,7 @@ import org.liupack.wanandroid.router.Router
 typealias OnSystemItemClick = (title: String, defaultIndex: Int, children: List<SystemBaseData>) -> Unit
 
 fun RouteBuilder.systemScreen(navigator: Navigator) {
-    scene(route = Router.System.path,navTransition = NavTransition()) {
+    scene(route = Router.System.path, navTransition = NavTransition()) {
         val logger = rememberLogger()
         val viewModel = koinViewModel(SystemViewModel::class)
         logger.i("初始化：systemScreen:${viewModel.hashCode()}")
@@ -44,8 +49,7 @@ fun RouteBuilder.systemScreen(navigator: Navigator) {
         }
         val uiState by viewModel.systemBaseData.collectAsState()
         val lazyListState = rememberLazyListState()
-        SystemScreen(
-            navigator = navigator,
+        SystemScreen(navigator = navigator,
             lazyListState = lazyListState,
             uiState = uiState,
             onRetry = { viewModel.dispatch(SystemAction.Refresh) })
@@ -62,43 +66,57 @@ private fun SystemScreen(
 ) {
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(
-            title = { Text("知识体系") },
-            colors = TopAppBarDefaults.topAppBarColors(
+            title = { Text("知识体系") }, colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 titleContentColor = MaterialTheme.colorScheme.onPrimary,
             )
         )
     }, content = { paddingValues ->
-        FullUiStateLayout(
-            modifier = Modifier.fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+        FullUiStateLayout(modifier = Modifier.fillMaxSize()
+            .padding(top = paddingValues.calculateTopPadding()),
             uiState = uiState,
             onRetry = onRetry,
             content = { dataList ->
                 LazyColumn(modifier = Modifier.fillMaxSize(),
                     state = lazyListState,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                     content = {
                         dataList.forEach { systemBaseData ->
-                            stickyHeader(key = systemBaseData.id) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.surface)
-                                        .padding(12.dp)
-                                ) {
-                                    Text(systemBaseData.name)
-                                }
-                            }
-                            items(systemBaseData.children.orEmpty(), key = { it.id }) { data ->
-                                Box(
-                                    modifier = Modifier.fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.surface)
-                                        .padding(12.dp)
-                                ) {
-                                    Text(data.name)
-                                }
-                            }
+                            systemParent(systemBaseData)
+                            systemChild(systemBaseData, navigator)
                         }
                     })
             })
     })
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun LazyListScope.systemParent(systemBaseData: SystemBaseData) {
+    stickyHeader(key = systemBaseData.id) {
+        Box(
+            modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)
+                .padding(12.dp)
+        ) {
+            Text(
+                text = systemBaseData.name, style = MaterialTheme.typography.titleLarge
+            )
+        }
+    }
+}
+
+private fun LazyListScope.systemChild(systemBaseData: SystemBaseData, navigator: Navigator) {
+    items(systemBaseData.children.orEmpty(), key = { it.id }) { data ->
+        Box(
+            modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)
+                .clickable {
+                    val path = Router.ArticleInSystem.parametersOf(
+                        RouterKey.title to data.name,
+                        RouterKey.id to data.id,
+                    )
+                    navigator.navigate(path)
+                }.padding(horizontal = 24.dp, vertical = 12.dp)
+        ) {
+            Text(data.name)
+        }
+    }
 }

@@ -1,36 +1,36 @@
 package org.liupack.wanandroid.ui.system.articles_in_system
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
-import moe.tlaster.precompose.navigation.path
+import moe.tlaster.precompose.navigation.query
 import org.koin.core.parameter.parametersOf
+import org.liupack.wanandroid.common.RouterKey
+import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
@@ -38,84 +38,69 @@ import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.articleInSystemScreen(navigator: Navigator) {
     scene(Router.ArticleInSystem.path) {
-        val id = it.path<Int>("id")
-        id?.let {
-            ArticleInSystemScreen(navigator = navigator, id = id)
-        }
+        val title = it.query<String>(RouterKey.title)
+        val id = it.query<Int>(RouterKey.id)
+        ArticleInSystemScreen(navigator = navigator, title = title, id = id)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ArticleInSystemScreen(navigator: Navigator, id: Int) {
+private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?) {
     val viewModel = koinViewModel(ArticleInSystemViewModel::class) { parametersOf(id) }
     val articleState = viewModel.articleState.collectAsLazyPagingItems()
-    PagingFullLoadLayout(
-        modifier = Modifier.fillMaxSize(),
-        pagingState = articleState,
-        content = {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(12.dp),
-                content = {
-                    items(
-                        articleState.itemCount,
-                        key = articleState.itemKey { it.id },
-                        itemContent = { index ->
-                            val data = articleState[index]
-                            if (data != null) {
-                                ArticleItem(data)
-                            }
-                        })
-                    pagingFooter(articleState)
-                }
-            )
-        })
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        TopAppBar(title = { Text(title ?: "文章") },
+            navigationIcon = { IconBackButton(onClick = { navigator.goBack() }) })
+    }, content = { paddingValues ->
+        PagingFullLoadLayout(modifier = Modifier.fillMaxSize()
+            .padding(top = paddingValues.calculateTopPadding()),
+            pagingState = articleState,
+            content = {
+                LazyColumn(modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(12.dp),
+                    content = {
+                        items(articleState.itemCount,
+                            key = articleState.itemKey { it.id },
+                            itemContent = { index ->
+                                val data = articleState[index]
+                                if (data != null) {
+                                    ArticleItem(data)
+                                }
+                            })
+                        pagingFooter(articleState)
+                    })
+            })
+    })
 }
 
 @Composable
-private fun ArticleItem(data: HomeArticleItemData) {
+private fun ArticleItem(data: HomeArticleItemData, onClick: (HomeArticleItemData) -> Unit = {}) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.large)
+            .clickable { onClick.invoke(data) }.padding(12.dp).clipToBounds(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Text(
-                text = data.author.orEmpty().ifEmpty { data.shareUser.orEmpty() },
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = data.niceDate.orEmpty(),
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
         Text(
-            text = data.title.orEmpty(),
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onBackground
+            text = data.title,
+            maxLines = 2,
+            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.Bold
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(buildAnnotatedString {
-                withStyle(SpanStyle(fontSize = 12.sp)) {
-                    append(data.superChapterName.orEmpty())
-                    append("·")
-                    append(data.chapterName.orEmpty())
-                }
-            }, modifier = Modifier.weight(1f))
-            Icon(
-                imageVector = Icons.Outlined.FavoriteBorder,
-                contentDescription = null,
-                modifier = Modifier.clip(CircleShape).clickable { }.padding(4.dp)
-            )
-        }
+        Text(
+            text = data.shareUser.orEmpty().ifEmpty { data.author.orEmpty() },
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = MaterialTheme.typography.titleSmall.fontSize,
+            modifier = Modifier.align(Alignment.End)
+        )
+        Text(
+            text = data.niceDate.orEmpty().ifEmpty { data.niceShareDate.orEmpty() },
+            color = MaterialTheme.colorScheme.outline,
+            fontSize = MaterialTheme.typography.titleSmall.fontSize,
+            modifier = Modifier.align(Alignment.End),
+        )
     }
 }

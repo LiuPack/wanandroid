@@ -26,6 +26,7 @@ import org.liupack.wanandroid.ui.login.loginScreen
 import org.liupack.wanandroid.ui.project.projectScreen
 import org.liupack.wanandroid.ui.register.registerScreen
 import org.liupack.wanandroid.ui.splash.splashScreen
+import org.liupack.wanandroid.ui.system.articles_in_system.articleInSystemScreen
 import org.liupack.wanandroid.ui.system.systemScreen
 import org.liupack.wanandroid.ui.user.userScreen
 import org.liupack.wanandroid.ui.user_coincount.userCoinCountScreen
@@ -47,6 +48,7 @@ fun MainScreen() {
                 splashScreen(navigator = navigator)
                 homeScreen(navigator = navigator)
                 systemScreen(navigator = navigator)
+                articleInSystemScreen(navigator = navigator)
                 wechatAccountScreen(navigator = navigator)
                 projectScreen(navigator = navigator)
                 userScreen(navigator = navigator)

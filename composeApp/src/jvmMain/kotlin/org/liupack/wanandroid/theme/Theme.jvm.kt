@@ -1,7 +1,7 @@
-package org.liupack.wanandroid.theme
-
-import androidx.compose.runtime.Composable
-
-@Composable
-internal actual fun SystemAppearance(isDark: Boolean) {
-}
+//package org.liupack.wanandroid.theme
+//
+//import androidx.compose.runtime.Composable
+//
+//@Composable
+//internal actual fun SystemAppearance(isDark: Boolean) {
+//}
