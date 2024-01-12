@@ -1,8 +1,8 @@
 package org.liupack.wanandroid.ui.wechat_account
 
-import cafe.adriel.voyager.core.model.ScreenModel
+import moe.tlaster.precompose.viewmodel.ViewModel
 import org.liupack.wanandroid.model.Repository
 
-class WechatAccountViewModel(private val repository: Repository) : ScreenModel {
+class WechatAccountViewModel(private val repository: Repository) : ViewModel() {
 
 }

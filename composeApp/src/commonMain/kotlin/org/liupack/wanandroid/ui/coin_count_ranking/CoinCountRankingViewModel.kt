@@ -1,14 +1,14 @@
 package org.liupack.wanandroid.ui.coin_count_ranking
 
 import androidx.paging.cachedIn
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.model.Repository
 
 class CoinCountRankingViewModel(
     repository: Repository
-) : ScreenModel {
+) : ViewModel() {
 
-    val coinCountRankingState = repository.coinCountRanking().cachedIn(screenModelScope)
+    val coinCountRankingState = repository.coinCountRanking().cachedIn(viewModelScope)
 
 }

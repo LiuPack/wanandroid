@@ -1,8 +1,5 @@
 package org.liupack.wanandroid.ui.user
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -11,6 +8,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.model.Repository
 import org.liupack.wanandroid.model.UiState
@@ -19,7 +18,7 @@ import org.liupack.wanandroid.model.entity.UserNavigator
 import org.liupack.wanandroid.network.exception.DataResultException
 import org.liupack.wanandroid.platform.settings
 
-class UserViewModel(private val repository: Repository) : ScreenModel {
+class UserViewModel(private val repository: Repository) : ViewModel() {
 
     private val mUserInfoState = MutableStateFlow<UiState<UserFullInfoData?>>(UiState.Loading)
     val userInfoState = mUserInfoState.asStateFlow()
@@ -54,13 +53,13 @@ class UserViewModel(private val repository: Repository) : ScreenModel {
     }
 
     private fun toLogin() {
-        screenModelScope.launch {
+        viewModelScope.launch {
             mToLogin.emit(true)
         }
     }
 
     private fun logout() {
-        screenModelScope.launch {
+        viewModelScope.launch {
             repository.logout().onStart {
                 mToLogout.emit(UiState.Loading)
             }.catch {
@@ -78,7 +77,7 @@ class UserViewModel(private val repository: Repository) : ScreenModel {
     }
 
     private fun userInfo() {
-        screenModelScope.launch {
+        viewModelScope.launch {
             repository.userInfo().catch {
                 if (it is DataResultException) {
                     mUserInfoState.emit(UiState.Failed(it.message))
@@ -89,10 +88,5 @@ class UserViewModel(private val repository: Repository) : ScreenModel {
                 mUserInfoState.emit(UiState.Success(it))
             }
         }
-    }
-
-    override fun onDispose() {
-        super.onDispose()
-        screenModelScope.cancel()
     }
 }

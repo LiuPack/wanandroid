@@ -69,7 +69,7 @@ data class HomeArticleItemData(
     @SerialName("tags")
     val tags: List<Tag>?,
     @SerialName("title")
-    val title: String?,
+    val title: String,
     @SerialName("type")
     val type: Int?,
     @SerialName("userId")

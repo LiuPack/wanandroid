@@ -55,12 +55,9 @@ kotlin {
             implementation(libs.paging.compose.common)
             implementation(libs.lt.compose.views)
             implementation(libs.windowsize.multiplatform)
-            implementation(libs.voyager.navigator)
-            implementation(libs.voyager.koin)
-            implementation(libs.voyager.screenModel)
-            implementation(libs.voyager.bottomSheetNavigator)
-            implementation(libs.voyager.tabNavigator)
-            implementation(libs.voyager.transitions)
+            implementation(libs.precompose.core)
+            implementation(libs.precompose.koin)
+            implementation(libs.precompose.viewmodel)
         }
 
         commonTest.dependencies {

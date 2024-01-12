@@ -1,115 +1,82 @@
 package org.liupack.wanandroid.ui.main
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.navigator.tab.CurrentTab
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabNavigator
-import org.liupack.wanandroid.ui.home.HomeTab
-import org.liupack.wanandroid.ui.project.ProjectTab
-import org.liupack.wanandroid.ui.system.SystemTab
-import org.liupack.wanandroid.ui.user.UserTab
-import org.liupack.wanandroid.ui.wechat_account.WechatAccountTab
+import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.navigation.NavHost
+import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.PopUpTo
+import moe.tlaster.precompose.navigation.rememberNavigator
+import org.liupack.wanandroid.router.Router
+import org.liupack.wanandroid.ui.coin_count_ranking.coinCountRankingScreen
+import org.liupack.wanandroid.ui.home.homeScreen
+import org.liupack.wanandroid.ui.login.loginScreen
+import org.liupack.wanandroid.ui.project.projectScreen
+import org.liupack.wanandroid.ui.register.registerScreen
+import org.liupack.wanandroid.ui.splash.splashScreen
+import org.liupack.wanandroid.ui.system.systemScreen
+import org.liupack.wanandroid.ui.user.userScreen
+import org.liupack.wanandroid.ui.user_coincount.userCoinCountScreen
+import org.liupack.wanandroid.ui.wechat_account.wechatAccountScreen
 
 
-internal val LocalParentNavigator
-    @Composable
-    get() = LocalNavigator.currentOrThrow.parent ?: LocalNavigator.currentOrThrow
-
-data object MainScreen : Screen {
-    @Composable
-    override fun Content() {
-        TabNavigatorContent()
-    }
-
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-    @Composable
-    private fun TabNavigatorContent() {
-        TabNavigator(HomeTab) {
-            val windowWidthSizeClass = calculateWindowSizeClass()
-            when (windowWidthSizeClass.widthSizeClass) {
-                WindowWidthSizeClass.Compact -> {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        Box(modifier = Modifier.weight(1f)) {
-                            CurrentTab()
-                        }
-                        NavigationBar(modifier = Modifier.fillMaxWidth()) {
-                            TabNavigatorItem(HomeTab)
-                            TabNavigatorItem(SystemTab)
-                            TabNavigatorItem(WechatAccountTab)
-                            TabNavigatorItem(ProjectTab)
-                            TabNavigatorItem(UserTab)
-                        }
-                    }
-                }
-
-                else -> {
-
-                    Row(modifier = Modifier.fillMaxSize()) {
-                        NavigationRail(modifier = Modifier.fillMaxHeight()) {
-                            TabNavigatorRailItem(HomeTab)
-                            TabNavigatorRailItem(SystemTab)
-                            TabNavigatorRailItem(WechatAccountTab)
-                            TabNavigatorRailItem(ProjectTab)
-                            TabNavigatorRailItem(UserTab)
-                        }
-                        Box(modifier = Modifier.weight(1f)) {
-                            CurrentTab()
-                        }
-                    }
+@Composable
+fun MainScreen() {
+    val navigator = rememberNavigator()
+    val viewModel = koinViewModel(MainViewModel::class)
+    val currentEntry by navigator.currentEntry.collectAsState(null)
+    val isNavigation = viewModel.navigationList.any { it.router.path == currentEntry?.path }
+    Column(modifier = Modifier.fillMaxSize()) {
+        NavHost(navigator = navigator,
+            initialRoute = Router.Splash.path,
+            modifier = Modifier.weight(1f),
+            persistNavState = true,
+            builder = {
+                splashScreen(navigator = navigator)
+                homeScreen(navigator = navigator)
+                systemScreen(navigator = navigator)
+                wechatAccountScreen(navigator = navigator)
+                projectScreen(navigator = navigator)
+                userScreen(navigator = navigator)
+                coinCountRankingScreen(navigator = navigator)
+                loginScreen(navigator = navigator)
+                registerScreen(navigator = navigator)
+                userCoinCountScreen(navigator = navigator)
+            })
+        AnimatedVisibility(
+            visible = isNavigation,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            BottomAppBar(modifier = Modifier.fillMaxWidth()) {
+                viewModel.navigationList.forEach {
+                    NavigationBarItem(selected = currentEntry?.path == it.router.path, onClick = {
+                        navigator.navigate(
+                            route = it.router.path, options = NavOptions(
+                                launchSingleTop = true,
+                                popUpTo = PopUpTo.First()
+                            )
+                        )
+                    }, icon = {
+                        Icon(imageVector = it.icon, contentDescription = null)
+                    }, label = {
+                        Text(text = it.label)
+                    })
                 }
             }
-
         }
-    }
-
-    @Composable
-    private fun TabNavigatorRailItem(tab: Tab = HomeTab) {
-        val tabNavigator = LocalTabNavigator.current
-        NavigationRailItem(
-            selected = tabNavigator.current.key == tab.key,
-            onClick = { tabNavigator.current = tab },
-            label = { Text(tab.options.title) },
-            icon = {
-                tab.options.icon?.let { painter ->
-                    Icon(painter, tab.options.title)
-                }
-            },
-        )
-    }
-
-    @Composable
-    private fun RowScope.TabNavigatorItem(tab: Tab = HomeTab) {
-        val tabNavigator = LocalTabNavigator.current
-        NavigationBarItem(
-            selected = tabNavigator.current.key == tab.key,
-            onClick = { tabNavigator.current = tab },
-            label = { Text(tab.options.title) },
-            icon = {
-                tab.options.icon?.let { painter ->
-                    Icon(painter, tab.options.title)
-                }
-            },
-        )
     }
 }

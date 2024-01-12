@@ -35,108 +35,111 @@ import androidx.compose.ui.unit.sp
 import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.RouteBuilder
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.CoinCountRankingData
-import org.liupack.wanandroid.ui.main.LocalParentNavigator
+import org.liupack.wanandroid.router.Router
 
-data object CoinCountRankingScreen : Screen {
+fun RouteBuilder.coinCountRankingScreen(navigator: Navigator) {
+    scene(Router.CoinCountRanking.path) {
+        CoinCountRankingScreen(navigator = navigator)
+    }
+}
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
-    @Composable
-    override fun Content() {
-        val navigator = LocalParentNavigator
-        val viewModel = getScreenModel<CoinCountRankingViewModel>()
-        val coinCountRankingState = viewModel.coinCountRankingState.collectAsLazyPagingItems()
-        val refreshing = coinCountRankingState.loadState.refresh is LoadStateLoading
-        val refreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = {
-            coinCountRankingState.refresh()
-        })
-        Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-            TopAppBar(
-                title = { Text("积分排行榜") },
-                navigationIcon = {
-                    IconBackButton(onClick = {
-                        navigator.pop()
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@Composable
+private fun CoinCountRankingScreen(navigator: Navigator) {
+    val viewModel = koinViewModel(CoinCountRankingViewModel::class)
+    val coinCountRankingState = viewModel.coinCountRankingState.collectAsLazyPagingItems()
+    val refreshing = coinCountRankingState.loadState.refresh is LoadStateLoading
+    val refreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = {
+        coinCountRankingState.refresh()
+    })
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        TopAppBar(
+            title = { Text("积分排行榜") },
+            navigationIcon = {
+                IconBackButton(onClick = {
+                    navigator.goBack()
+                })
+            },
+        )
+    }, content = { paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            PagingFullLoadLayout(
+                modifier = Modifier.pullRefresh(refreshState),
+                pagingState = coinCountRankingState,
+                content = {
+                    LazyColumn(modifier = Modifier.fillMaxSize(), content = {
+                        items(coinCountRankingState.itemCount,
+                            key = coinCountRankingState.itemKey { it.userId }) { index ->
+                            val data = coinCountRankingState[index]
+                            if (data != null) {
+                                CoinCountRankingItem(
+                                    data = data,
+                                    max = coinCountRankingState[0]?.coinCount ?: 0
+                                )
+                            }
+                        }
+                        pagingFooter(pagingState = coinCountRankingState)
                     })
                 },
             )
-        }, content = { paddingValues ->
-            Box(
-                modifier = Modifier.padding(paddingValues).fillMaxSize(),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                PagingFullLoadLayout(
-                    modifier = Modifier.pullRefresh(refreshState),
-                    pagingState = coinCountRankingState,
-                    content = {
-                        LazyColumn(modifier = Modifier.fillMaxSize(), content = {
-                            items(coinCountRankingState.itemCount,
-                                key = coinCountRankingState.itemKey { it.userId }) { index ->
-                                val data = coinCountRankingState[index]
-                                if (data != null) {
-                                    CoinCountRankingItem(
-                                        data = data,
-                                        max = coinCountRankingState[0]?.coinCount ?: 0
-                                    )
-                                }
-                            }
-                            pagingFooter(pagingState = coinCountRankingState)
-                        })
-                    },
-                )
-                PullRefreshIndicator(
-                    refreshing = refreshing, state = refreshState
-                )
-            }
-        })
-    }
-
-    @OptIn(ExperimentalMaterialApi::class)
-    @Composable
-    private fun CoinCountRankingItem(data: CoinCountRankingData, max: Int) {
-        val scope = rememberCoroutineScope()
-        val widthFraction by remember { derivedStateOf { if (max == 0) 1f else data.coinCount / max.toFloat() } }
-        val color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-        val animatable = remember(data.userId) { Animatable(0f) }
-        DisposableEffect(widthFraction) {
-            scope.launch {
-                animatable.animateTo(widthFraction, animationSpec = tween(1000))
-            }
-            onDispose {
-                scope.launch {
-                    animatable.stop()
-                }.invokeOnCompletion { scope.cancel() }
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth().drawWithContent {
-                drawRect(
-                    color = color,
-                    size = size.copy(this.size.width * animatable.value)
-                )
-                drawContent()
-            }.padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Chip(content = {
-                Text(text = data.rankDesc, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }, onClick = {})
-            Text(text = data.username, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(
-                text = "${data.coinCount}",
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.End,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.error
+            PullRefreshIndicator(
+                refreshing = refreshing, state = refreshState
             )
         }
+    })
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun CoinCountRankingItem(data: CoinCountRankingData, max: Int) {
+    val scope = rememberCoroutineScope()
+    val widthFraction by remember { derivedStateOf { if (max == 0) 1f else data.coinCount / max.toFloat() } }
+    val color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+    val animatable = remember(data.userId) { Animatable(0f) }
+    DisposableEffect(widthFraction) {
+        scope.launch {
+            animatable.animateTo(widthFraction, animationSpec = tween(1000))
+        }
+        onDispose {
+            scope.launch {
+                animatable.stop()
+            }.invokeOnCompletion { scope.cancel() }
+        }
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth().drawWithContent {
+            drawRect(
+                color = color,
+                size = size.copy(this.size.width * animatable.value)
+            )
+            drawContent()
+        }.padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Chip(content = {
+            Text(text = data.rankDesc, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        }, onClick = {})
+        Text(text = data.username, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = "${data.coinCount}",
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.error
+        )
     }
 }

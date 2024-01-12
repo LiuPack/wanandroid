@@ -1,29 +1,24 @@
 package org.liupack.wanandroid.ui.system
 
-import androidx.compose.foundation.lazy.LazyListState
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.model.Repository
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.SystemBaseData
 import org.liupack.wanandroid.network.exception.DataResultException
 
-class SystemViewModel(private val repository: Repository) : ScreenModel {
-
-    val lazyListState = LazyListState()
+class SystemViewModel(private val repository: Repository) : ViewModel() {
 
     private val mSystemBaseData = MutableStateFlow<UiState<List<SystemBaseData>>>(UiState.Loading)
     val systemBaseData = mSystemBaseData.asStateFlow()
-
     fun dispatch(action: SystemAction) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             when (action) {
                 is SystemAction.Init -> {
                     systemBaseData()
@@ -39,7 +34,7 @@ class SystemViewModel(private val repository: Repository) : ScreenModel {
     }
 
     private fun systemBaseData() {
-        screenModelScope.launch {
+        viewModelScope.launch {
             repository.systemBaseList().catch {
                 if (it is DataResultException) {
                     mSystemBaseData.emit(UiState.Failed(it.message))
@@ -53,7 +48,7 @@ class SystemViewModel(private val repository: Repository) : ScreenModel {
     }
 
     private fun refreshData() {
-        screenModelScope.launch {
+        viewModelScope.launch {
             repository.systemBaseList().onStart {
                 mSystemBaseData.emit(UiState.Loading)
             }.catch {
@@ -66,10 +61,5 @@ class SystemViewModel(private val repository: Repository) : ScreenModel {
                 mSystemBaseData.emit(UiState.Success(it))
             }
         }
-    }
-
-    override fun onDispose() {
-        super.onDispose()
-        screenModelScope.cancel()
     }
 }
