@@ -1,4 +1,4 @@
-package theme
+package org.liupack.wanandroid.theme
 
 import androidx.compose.ui.graphics.Color
 

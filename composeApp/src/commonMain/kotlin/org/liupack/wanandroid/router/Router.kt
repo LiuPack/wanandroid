@@ -39,4 +39,7 @@ sealed class Router(val path: String) {
 
     @Stable
     data object UserCoinCount : Router("/user_coin_count")
+
+    @Stable
+    data object WebView : Router("/web_view_content")
 }

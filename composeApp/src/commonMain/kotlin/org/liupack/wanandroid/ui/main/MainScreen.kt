@@ -29,6 +29,7 @@ import org.liupack.wanandroid.ui.system.articles_in_system.articleInSystemScreen
 import org.liupack.wanandroid.ui.system.systemScreen
 import org.liupack.wanandroid.ui.user.userScreen
 import org.liupack.wanandroid.ui.user_coincount.userCoinCountScreen
+import org.liupack.wanandroid.ui.webview.webviewScreen
 import org.liupack.wanandroid.ui.wechat_account.wechatAccountScreen
 
 
@@ -55,6 +56,7 @@ fun MainScreen() {
                 loginScreen(navigator = navigator)
                 registerScreen(navigator = navigator)
                 userCoinCountScreen(navigator = navigator)
+                webviewScreen(navigator = navigator)
             })
         AnimatedVisibility(
             visible = isNavigation,

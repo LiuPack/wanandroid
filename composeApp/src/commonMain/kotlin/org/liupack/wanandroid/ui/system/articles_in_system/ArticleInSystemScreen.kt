@@ -30,6 +30,7 @@ import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.query
 import org.koin.core.parameter.parametersOf
 import org.liupack.wanandroid.common.RouterKey
+import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
@@ -66,7 +67,11 @@ private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?
                             itemContent = { index ->
                                 val data = articleState[index]
                                 if (data != null) {
-                                    ArticleItem(data)
+                                    ArticleItem(data, onClick = {
+                                        val path =
+                                            Router.WebView.parametersOf(RouterKey.url to it.link)
+                                        navigator.navigate(path)
+                                    })
                                 }
                             })
                         pagingFooter(articleState)

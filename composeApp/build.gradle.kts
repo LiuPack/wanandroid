@@ -58,6 +58,7 @@ kotlin {
             implementation(libs.precompose.core)
             implementation(libs.precompose.koin)
             implementation(libs.precompose.viewmodel)
+            implementation(libs.webview.multiplatform)
         }
 
         commonTest.dependencies {

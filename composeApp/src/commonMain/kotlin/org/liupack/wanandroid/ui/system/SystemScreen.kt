@@ -23,10 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.BackHandler
+import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
@@ -38,8 +41,6 @@ import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.SystemBaseData
 import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
-
-typealias OnSystemItemClick = (title: String, defaultIndex: Int, children: List<SystemBaseData>) -> Unit
 
 fun RouteBuilder.systemScreen(navigator: Navigator) {
     scene(route = Router.System.path, navTransition = NavTransition()) {
@@ -59,7 +60,7 @@ fun RouteBuilder.systemScreen(navigator: Navigator) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SystemScreen(
     navigator: Navigator,
@@ -97,8 +98,10 @@ private fun SystemScreen(
 private fun LazyListScope.systemParent(systemBaseData: SystemBaseData) {
     stickyHeader(key = systemBaseData.id) {
         Box(
-            modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)
-                .padding(12.dp)
+            modifier = Modifier.fillMaxWidth().shadow(2.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(12.dp),
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = systemBaseData.name, style = MaterialTheme.typography.titleLarge
@@ -116,7 +119,7 @@ private fun LazyListScope.systemChild(systemBaseData: SystemBaseData, navigator:
                         RouterKey.title to data.name,
                         RouterKey.id to data.id,
                     )
-                    navigator.navigate(path)
+                    navigator.navigate(path, options = NavOptions(launchSingleTop = true))
                 }.padding(horizontal = 24.dp, vertical = 12.dp)
         ) {
             Text(data.name)
