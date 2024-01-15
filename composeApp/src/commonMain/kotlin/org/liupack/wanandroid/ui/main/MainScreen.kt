@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.NavOptions
-import moe.tlaster.precompose.navigation.PopUpTo
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.liupack.wanandroid.router.Router
 import org.liupack.wanandroid.ui.coin_count_ranking.coinCountRankingScreen
@@ -67,10 +66,7 @@ fun MainScreen() {
                 viewModel.navigationList.forEach {
                     NavigationBarItem(selected = currentEntry?.path == it.router.path, onClick = {
                         navigator.navigate(
-                            route = it.router.path, options = NavOptions(
-                                launchSingleTop = true,
-                                popUpTo = PopUpTo.First()
-                            )
+                            route = it.router.path, options = NavOptions(launchSingleTop = true)
                         )
                     }, icon = {
                         Icon(imageVector = it.icon, contentDescription = null)

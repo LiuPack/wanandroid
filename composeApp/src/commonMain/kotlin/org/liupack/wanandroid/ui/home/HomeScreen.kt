@@ -32,6 +32,7 @@ import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
 import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
@@ -40,10 +41,12 @@ import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.openUrl
+import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.homeScreen(navigator: Navigator) {
     scene(route = Router.Home.path, navTransition = NavTransition()) {
+        BackHandler { exitApp() }
         val viewModel = koinViewModel(HomeViewModel::class)
         val articleState = viewModel.articles.collectAsLazyPagingItems()
         val lazyListState = rememberLazyListState()

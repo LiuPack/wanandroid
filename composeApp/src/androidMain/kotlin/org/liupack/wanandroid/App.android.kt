@@ -10,6 +10,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.liupack.wanandroid.model.di.appModule
 
 class AndroidApp : Application() {
     companion object {
@@ -19,6 +22,14 @@ class AndroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
         INSTANCE = this
+        initKoin()
+    }
+
+    private fun initKoin() {
+        stopKoin()
+        startKoin {
+            modules(appModule)
+        }
     }
 }
 
@@ -35,6 +46,7 @@ class AppActivity : ComponentActivity() {
             )
         )
         super.onCreate(savedInstanceState)
+        ActivityManager.initActivity(this)
         setContent {
             App()
         }

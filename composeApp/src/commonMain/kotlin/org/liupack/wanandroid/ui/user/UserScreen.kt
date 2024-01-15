@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
@@ -51,10 +52,12 @@ import org.liupack.wanandroid.model.UiState.Companion.successDataOrNull
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserNavigator
 import org.liupack.wanandroid.openUrl
+import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.userScreen(navigator: Navigator) {
     scene(route = Router.User.path, navTransition = NavTransition()) {
+        BackHandler { exitApp() }
         UserScreen(navigator = navigator)
     }
 }

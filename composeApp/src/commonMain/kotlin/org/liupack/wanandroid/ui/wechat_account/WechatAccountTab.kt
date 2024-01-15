@@ -7,13 +7,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
+import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.wechatAccountScreen(navigator: Navigator) {
     scene(route = Router.WechatAccount.path,navTransition = NavTransition()) {
+        BackHandler { exitApp() }
         WechatAccountScreen(navigator)
     }
 }

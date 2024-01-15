@@ -8,13 +8,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
+import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.projectScreen(navigator: Navigator) {
     scene(route = Router.Project.path,navTransition = NavTransition()) {
+        BackHandler { exitApp() }
         ProjectScreen(navigator = navigator)
     }
 }
