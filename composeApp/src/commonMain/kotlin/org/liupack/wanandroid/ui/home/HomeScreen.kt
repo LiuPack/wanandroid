@@ -33,10 +33,13 @@ import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.BackHandler
+import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.Constants
+import org.liupack.wanandroid.common.RouterKey
+import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
@@ -91,7 +94,13 @@ private fun HomeScreen(
                     itemContent = { index ->
                         val item = lazyPagingItems[index]
                         if (item != null) {
-                            ArticleItem(data = item, onClick = {})
+                            ArticleItem(data = item, onClick = {
+                                val path = Router.WebView.parametersOf(RouterKey.url to it.link)
+                                navigator.navigate(
+                                    route = path,
+                                    options = NavOptions(launchSingleTop = true)
+                                )
+                            })
                         }
                     })
                 pagingFooter(lazyPagingItems)
