@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -59,23 +60,25 @@ fun RouteBuilder.splashScreen(navigator: Navigator) {
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SplashScreen(countDown: Int, skipClick: () -> Unit = {}) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            content = {
-                Image(
-                    painter = painterResource("compose-multiplatform.xml"),
-                    contentDescription = null,
-                    modifier = Modifier.size(100.dp)
-                )
-                Text("PreCompose App")
-            }
-        )
-        OutlinedButton(modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
-            .padding(12.dp).align(Alignment.TopEnd), onClick = skipClick, content = {
-            Text("跳过${countDown}")
-        })
+    Scaffold {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                content = {
+                    Image(
+                        painter = painterResource("compose-multiplatform.xml"),
+                        contentDescription = null,
+                        modifier = Modifier.size(100.dp)
+                    )
+                    Text("PreCompose App")
+                }
+            )
+            OutlinedButton(modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(12.dp).align(Alignment.TopEnd), onClick = skipClick, content = {
+                Text("跳过${countDown}")
+            })
+        }
     }
 }

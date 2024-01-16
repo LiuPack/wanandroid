@@ -19,13 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -100,7 +100,10 @@ private fun UserScreen(navigator: Navigator) {
                     viewModel.dispatch(UserAction.Logout)
                 }
 
-                UserNavigator.SystemSetting -> {}
+                UserNavigator.SystemSetting -> {
+                    navigator.navigate(Router.Setting.path)
+                }
+
                 UserNavigator.UserCoinCount -> {
                     navigator.navigate(Router.UserCoinCount.path)
                 }
@@ -132,7 +135,6 @@ private fun logoutUiState(uiState: UiState<Boolean>, refresh: () -> Unit = {}) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun UserInfoContent(
     userInfoState: UiState<UserFullInfoData?>? = null,
@@ -141,96 +143,103 @@ private fun UserInfoContent(
     needLogin: () -> Unit = {},
     refresh: () -> Unit = {},
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth().aspectRatio(2f).background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.secondary,
-                            MaterialTheme.colorScheme.tertiary,
+    Scaffold {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().aspectRatio(2f).background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.secondary,
+                                MaterialTheme.colorScheme.tertiary,
+                            )
                         )
-                    )
-                ).padding(WindowInsets.safeDrawing.asPaddingValues()),
-                contentAlignment = Alignment.Center
-            ) {
-                FullUiStateLayout(
-                    modifier = Modifier.matchParentSize(),
-                    uiState = userInfoState,
-                    onRetry = {
-                        if (userInfoState?.isLoginExpired == true) {
-                            needLogin.invoke()
-                        } else {
-                            refresh.invoke()
-                        }
-                    },
-                    content = { data ->
-                        if (data != null) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                //https://www.iconfont.cn/illustrations/detail?spm=a313x.illustrations_index.i1.d9df05512.6ae13a81mzJ56W&cid=47401
-                                Image(
-                                    painter = painterResource("user_avatar.png"),
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(vertical = 12.dp).size(50.dp)
-                                        .clip(CircleShape).border(
-                                            width = 2.dp,
-                                            color = MaterialTheme.colorScheme.onPrimary,
-                                            shape = CircleShape
-                                        )
-                                )
-                                Text(
-                                    text = data.userInfoData?.username ?: "",
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onPrimary
+                    ).padding(WindowInsets.safeDrawing.asPaddingValues()),
+                    contentAlignment = Alignment.Center
+                ) {
+                    FullUiStateLayout(
+                        modifier = Modifier.matchParentSize(),
+                        uiState = userInfoState,
+                        onRetry = {
+                            if (userInfoState?.isLoginExpired == true) {
+                                needLogin.invoke()
+                            } else {
+                                refresh.invoke()
+                            }
+                        },
+                        content = { data ->
+                            if (data != null) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    //https://www.iconfont.cn/illustrations/detail?spm=a313x.illustrations_index.i1.d9df05512.6ae13a81mzJ56W&cid=47401
+                                    Image(
+                                        painter = painterResource("user_avatar.png"),
+                                        contentDescription = null,
+                                        modifier = Modifier.padding(vertical = 12.dp).size(50.dp)
+                                            .clip(CircleShape).border(
+                                                width = 2.dp,
+                                                color = MaterialTheme.colorScheme.onPrimary,
+                                                shape = CircleShape
+                                            )
                                     )
-                                )
-                                Text(
-                                    text = "ID:${data.coinInfoData?.userId ?: 0}",
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                )
-                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     Text(
-                                        text = "等级:${data.coinInfoData?.level ?: 0}",
-                                        style = MaterialTheme.typography.bodySmall.copy(
+                                        text = data.userInfoData?.username ?: "",
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            fontWeight = FontWeight.Bold,
                                             color = MaterialTheme.colorScheme.onPrimary
                                         )
                                     )
                                     Text(
-                                        text = "排名: ${data.coinInfoData?.rank ?: 0}",
+                                        text = "ID:${data.coinInfoData?.userId ?: 0}",
                                         style = MaterialTheme.typography.bodySmall.copy(
                                             color = MaterialTheme.colorScheme.onPrimary
                                         )
                                     )
+                                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                        Text(
+                                            text = "等级:${data.coinInfoData?.level ?: 0}",
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        )
+                                        Text(
+                                            text = "排名: ${data.coinInfoData?.rank ?: 0}",
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
-                )
-            }
-        }
-        items(userNavigator) { navigator ->
-            ListItem(modifier = Modifier.fillMaxWidth()
-                .clickable(enabled = userInfoState?.successDataOrNull != null) {
-                    itemClick.invoke(navigator)
-                },
-                icon = { Icon(imageVector = navigator.icon, contentDescription = null) },
-                trailing = {
-                    Icon(
-                        imageVector = Icons.Rounded.KeyboardArrowRight,
-                        contentDescription = null
                     )
-                },
-                text = {
-                    Text(navigator.name, fontWeight = FontWeight.Bold)
-                })
+                }
+            }
+            items(userNavigator) { navigator ->
+                ListItem(modifier = Modifier.fillMaxWidth()
+                    .clickable(enabled = userInfoState?.successDataOrNull != null) {
+                        itemClick.invoke(navigator)
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = navigator.icon,
+                            contentDescription = null
+                        )
+                    },
+                    trailingContent = {
+                        Icon(
+                            imageVector = Icons.Rounded.KeyboardArrowRight,
+                            contentDescription = null
+                        )
+                    },
+                    headlineContent = {
+                        Text(navigator.name, fontWeight = FontWeight.Bold)
+                    })
+            }
         }
     }
 }

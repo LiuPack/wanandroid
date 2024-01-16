@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -61,39 +62,48 @@ private fun ProjectScreen(navigator: Navigator) {
             modifier = Modifier.fillMaxSize(),
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
-                TopAppBar(title = {
-                    ScrollableTabRow(
-                        selectedTabIndex = selectIndex,
-                        modifier = Modifier.fillMaxWidth(),
-                        edgePadding = 0.dp,
-                        divider = {},
-                        indicator = {},
-                        tabs = {
-                            projectSortList.forEachIndexed { index, data ->
-                                Box(
-                                    modifier = Modifier.padding(end = 12.dp).fillMaxWidth()
-                                        .clip(MaterialTheme.shapes.medium)
-                                        .clickable {
-                                            viewModel.updateSelected(index)
-                                            childNavigator.navigate(
-                                                routers[index],
-                                                options = NavOptions(launchSingleTop = true)
-                                            )
-                                        }.background(
-                                            MaterialTheme.colorScheme.inversePrimary.copy(if (index == selectIndex) 0.3f else 0f),
-                                            MaterialTheme.shapes.medium
-                                        ).padding(horizontal = 12.dp, vertical = 6.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = data.name,
-                                        fontSize = MaterialTheme.typography.titleMedium.fontSize
-                                    )
+                TopAppBar(
+                    title = {
+                        ScrollableTabRow(
+                            selectedTabIndex = selectIndex,
+                            modifier = Modifier.padding(end = 16.dp).fillMaxWidth()
+                                .clip(MaterialTheme.shapes.medium),
+                            edgePadding = 0.dp,
+                            divider = {},
+                            indicator = {},
+                            tabs = {
+                                projectSortList.forEachIndexed { index, data ->
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth()
+                                            .clip(MaterialTheme.shapes.medium)
+                                            .clickable {
+                                                viewModel.updateSelected(index)
+                                                childNavigator.navigate(
+                                                    routers[index],
+                                                    options = NavOptions(launchSingleTop = true)
+                                                )
+                                            }.background(
+                                                MaterialTheme.colorScheme.inversePrimary.copy(if (index == selectIndex) 0.3f else 0f),
+                                                MaterialTheme.shapes.medium
+                                            ).padding(horizontal = 12.dp, vertical = 6.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = data.name,
+                                            fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    )
-                })
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                )
             },
             content = { paddingValues ->
                 NavHost(

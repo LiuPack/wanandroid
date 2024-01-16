@@ -45,4 +45,7 @@ sealed class Router(val path: String) {
 
     @Stable
     data object WebView : Router("/web_view_content")
+
+    @Stable
+    data object Setting : Router("/setting")
 }

@@ -7,4 +7,5 @@ object Constants {
     const val loginUserPassword = "loginUserPassword"
     const val projectUrl = "https://github.com/LiuPack/wanandroid"
     const val projectUserHome = "https://github.com/LiuPack"
+    const val darkTheme = "darkTheme"
 }

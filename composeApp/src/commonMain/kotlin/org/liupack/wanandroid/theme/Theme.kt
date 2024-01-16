@@ -5,6 +5,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import org.liupack.wanandroid.common.Constants
+import org.liupack.wanandroid.platform.settings
 
 
 private val LightColors = lightColorScheme(
@@ -71,19 +78,28 @@ private val DarkColors = darkColorScheme(
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
 )
+internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
 
 @Composable
 fun AppTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
-    val colors = if (!useDarkTheme) {
-        LightColors
-    } else {
-        DarkColors
+    val systemIsDark =
+        if (settings.getBooleanOrNull(Constants.darkTheme) == null) isSystemInDarkTheme() else settings.getBoolean(
+            Constants.darkTheme,
+            false
+        )
+    val isDarkState = remember { mutableStateOf(systemIsDark) }
+    CompositionLocalProvider(LocalThemeIsDark provides isDarkState) {
+        val isDark by isDarkState
+        val colors = if (!isDark) {
+            LightColors
+        } else {
+            DarkColors
+        }
+        MaterialTheme(
+            colorScheme = colors,
+            content = content
+        )
     }
-    MaterialTheme(
-        colorScheme = colors,
-        content = content
-    )
 }

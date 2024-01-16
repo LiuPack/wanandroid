@@ -24,6 +24,7 @@ import org.liupack.wanandroid.ui.home.homeScreen
 import org.liupack.wanandroid.ui.login.loginScreen
 import org.liupack.wanandroid.ui.project.projectScreen
 import org.liupack.wanandroid.ui.register.registerScreen
+import org.liupack.wanandroid.ui.setting.settingScreen
 import org.liupack.wanandroid.ui.splash.splashScreen
 import org.liupack.wanandroid.ui.system.articles_in_system.articleInSystemScreen
 import org.liupack.wanandroid.ui.system.systemScreen
@@ -57,6 +58,7 @@ fun MainScreen() {
                 registerScreen(navigator = navigator)
                 userCoinCountScreen(navigator = navigator)
                 webviewScreen(navigator = navigator)
+                settingScreen(navigator = navigator)
             })
         AnimatedVisibility(
             visible = isNavigation,
