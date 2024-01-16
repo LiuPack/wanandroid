@@ -32,6 +32,7 @@ import app.cash.paging.compose.itemKey
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.RouteBuilder
 import org.koin.core.parameter.parametersOf
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
@@ -41,6 +42,17 @@ import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.composables.rememberLazyListState
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.router.Router
+
+
+fun RouteBuilder.projectListScreen(
+    parentNavigator: Navigator,
+    router: String,
+    id: Int
+) {
+    scene(route = router) {
+        ProjectListScreen(parentNavigator, id)
+    }
+}
 
 @Composable
 fun ProjectListScreen(navigator: Navigator, id: Int) {

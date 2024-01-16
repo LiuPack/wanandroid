@@ -29,6 +29,9 @@ sealed class Router(val path: String) {
     data object Project : Router("/project")
 
     @Stable
+    data object ProjectList : Router("/project_list")
+
+    @Stable
     data object User : Router("/user")
 
     @Stable

@@ -1,33 +1,38 @@
 package org.liupack.wanandroid.ui.project
 
-import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.lt.compose_views.compose_pager.ComposePager
-import com.lt.compose_views.compose_pager.rememberComposePagerState
-import com.lt.compose_views.pager_indicator.TextPagerIndicator
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.BackHandler
+import moe.tlaster.precompose.navigation.NavHost
+import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
-import org.liupack.wanandroid.ui.project.child.ProjectListScreen
+import org.liupack.wanandroid.ui.project.child.projectListScreen
 
 fun RouteBuilder.projectScreen(navigator: Navigator) {
     scene(route = Router.Project.path, navTransition = NavTransition()) {
@@ -45,40 +50,67 @@ private fun ProjectScreen(navigator: Navigator) {
     }
     val projectSortList by viewModel.projectSort.collectAsState()
     if (projectSortList.isNotEmpty()) {
-        val pagerState = rememberComposePagerState()
+        val childNavigator = rememberNavigator()
+        val routers by remember {
+            derivedStateOf {
+                projectSortList.map { it.id.toString() }.toList()
+            }
+        }
+        val selectIndex by viewModel.selectIndex.collectAsState()
         Scaffold(
             modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 TopAppBar(title = {
-                    TextPagerIndicator(
-                        texts = projectSortList.map { it.name }.toList(),
-                        offsetPercentWithSelectFlow = remember { pagerState.createChildOffsetPercentFlow() },
-                        selectIndexFlow = remember { pagerState.createCurrSelectIndexFlow() },
-                        fontSize = 16.sp,
-                        selectFontSize = 20.sp,
-                        textColor = MaterialTheme.colorScheme.onSurface,
-                        selectTextColor = MaterialTheme.colorScheme.primary,
-                        selectIndicatorColor = MaterialTheme.colorScheme.primary,
-                        onIndicatorClick = {
-                            pagerState.setPageIndexWithAnimate(it)
-                        },
-                        modifier = Modifier.fillMaxWidth().height(35.dp),
-                        margin = 28.dp,
+                    ScrollableTabRow(
+                        selectedTabIndex = selectIndex,
+                        modifier = Modifier.fillMaxWidth(),
+                        edgePadding = 0.dp,
+                        divider = {},
+                        indicator = {},
+                        tabs = {
+                            projectSortList.forEachIndexed { index, data ->
+                                Box(
+                                    modifier = Modifier.padding(end = 12.dp).fillMaxWidth()
+                                        .clip(MaterialTheme.shapes.medium)
+                                        .clickable {
+                                            viewModel.updateSelected(index)
+                                            childNavigator.navigate(
+                                                routers[index],
+                                                options = NavOptions(launchSingleTop = true)
+                                            )
+                                        }.background(
+                                            MaterialTheme.colorScheme.inversePrimary.copy(if (index == selectIndex) 0.3f else 0f),
+                                            MaterialTheme.shapes.medium
+                                        ).padding(horizontal = 12.dp, vertical = 6.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = data.name,
+                                        fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                    )
+                                }
+                            }
+                        }
                     )
                 })
             },
             content = { paddingValues ->
-                ComposePager(
-                    pageCount = projectSortList.size,
+                NavHost(
+                    navigator = childNavigator,
+                    initialRoute = routers.first(),
                     modifier = Modifier.fillMaxSize()
                         .padding(top = paddingValues.calculateTopPadding()),
-                    composePagerState = pagerState,
-                    orientation = Orientation.Horizontal, userEnable = false,
-                    content = {
-                        val id = projectSortList[pagerState.getCurrSelectIndex()].id
-                        ProjectListScreen(navigator, id)
-                    }
-                )
+                    persistNavState = true,
+                    builder = {
+                        routers.forEach {
+                            projectListScreen(
+                                parentNavigator = navigator,
+                                router = it,
+                                id = it.toInt()
+                            )
+                        }
+                    })
             })
     }
 }
