@@ -6,6 +6,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.BackHandler
@@ -29,10 +30,10 @@ private fun WechatAccountScreen(navigator: Navigator) {
     Scaffold(topBar = {
         TopAppBar(
             title = { Text("公众号") }, colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
             )
         )
     }) {

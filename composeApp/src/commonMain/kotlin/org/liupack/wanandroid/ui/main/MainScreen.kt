@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -66,7 +68,11 @@ fun MainScreen() {
             exit = shrinkVertically(),
             modifier = Modifier.fillMaxWidth()
         ) {
-            BottomAppBar(modifier = Modifier.fillMaxWidth()) {
+            BottomAppBar(
+                modifier = Modifier.fillMaxWidth(),
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = contentColorFor(MaterialTheme.colorScheme.background)
+            ) {
                 viewModel.navigationList.forEach {
                     NavigationBarItem(selected = currentEntry?.path == it.router.path, onClick = {
                         navigator.navigate(

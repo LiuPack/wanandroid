@@ -117,7 +117,7 @@ fun <T> FullUiStateLayout(
 
             is UiState.Exception -> {
                 val message =
-                    if (uiState.isLoginExpired) "登录过期，请重新登录" else uiState.throwable.message
+                    if (uiState.isLoginExpired) "未登录" else uiState.throwable.message
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Button(onClick = onRetry, content = {
                         Text(message ?: "重新加载")

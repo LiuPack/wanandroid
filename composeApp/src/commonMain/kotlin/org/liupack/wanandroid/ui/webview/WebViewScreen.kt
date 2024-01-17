@@ -10,9 +10,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -63,7 +66,14 @@ fun WebViewScreen(navigator: Navigator, url: String) {
             title = { Text(title, maxLines = 1, modifier = Modifier.basicMarquee()) },
             navigationIcon = {
                 IconBackButton(onClick = { navigator.goBack() }, imageVector = Icons.Outlined.Close)
-            })
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+            ),
+        )
     }, content = { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
             WebView(

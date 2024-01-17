@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -60,7 +61,10 @@ fun RouteBuilder.splashScreen(navigator: Navigator) {
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SplashScreen(countDown: Int, skipClick: () -> Unit = {}) {
-    Scaffold {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground
+    ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -70,7 +74,7 @@ fun SplashScreen(countDown: Int, skipClick: () -> Unit = {}) {
                     Image(
                         painter = painterResource("compose-multiplatform.xml"),
                         contentDescription = null,
-                        modifier = Modifier.size(100.dp)
+                        modifier = Modifier.size(100.dp),
                     )
                     Text("PreCompose App")
                 }

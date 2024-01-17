@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -57,52 +58,55 @@ private fun HomeScreen(
     lazyPagingItems: LazyPagingItems<HomeArticleItemData>,
     lazyListState: LazyListState,
 ) {
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        TopAppBar(
-            title = { Text("首页") },
-            actions = {
-                IconButton(
-                    onClick = {
-                        openUrl(Constants.projectUrl)
-                    },
-                    content = {
-                        Icon(Icons.Outlined.Public, null)
-                    },
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text("首页") },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            openUrl(Constants.projectUrl)
+                        },
+                        content = {
+                            Icon(Icons.Outlined.Public, null)
+                        },
+                    )
+                }, colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                    actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                    navigationIconContentColor =contentColorFor(MaterialTheme.colorScheme.background),
                 )
-            }, colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
             )
-        )
-    }, content = { paddingValues ->
-        PagingFullLoadLayout(
-            modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-            pagingState = lazyPagingItems
-        ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(12.dp),
-                state = lazyListState
+        },
+        content = { paddingValues ->
+            PagingFullLoadLayout(
+                modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+                pagingState = lazyPagingItems
             ) {
-                items(count = lazyPagingItems.itemCount,
-                    key = lazyPagingItems.itemKey { it.id },
-                    itemContent = { index ->
-                        val item = lazyPagingItems[index]
-                        if (item != null) {
-                            ArticleItem(data = item, onClick = {
-                                val path = Router.WebView.parametersOf(RouterKey.url to it.link)
-                                navigator.navigate(
-                                    route = path,
-                                    options = NavOptions(launchSingleTop = true)
-                                )
-                            })
-                        }
-                    })
-                pagingFooter(lazyPagingItems)
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(12.dp),
+                    state = lazyListState
+                ) {
+                    items(count = lazyPagingItems.itemCount,
+                        key = lazyPagingItems.itemKey { it.id },
+                        itemContent = { index ->
+                            val item = lazyPagingItems[index]
+                            if (item != null) {
+                                ArticleItem(data = item, onClick = {
+                                    val path = Router.WebView.parametersOf(RouterKey.url to it.link)
+                                    navigator.navigate(
+                                        route = path,
+                                        options = NavOptions(launchSingleTop = true)
+                                    )
+                                })
+                            }
+                        })
+                    pagingFooter(lazyPagingItems)
+                }
             }
-        }
-    })
+        })
 }

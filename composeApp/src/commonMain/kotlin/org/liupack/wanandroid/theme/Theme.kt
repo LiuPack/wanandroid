@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import org.liupack.wanandroid.common.Constants
+import org.liupack.wanandroid.platform.SystemAppearance
 import org.liupack.wanandroid.platform.settings
 
 
@@ -97,6 +98,7 @@ fun AppTheme(
         } else {
             DarkColors
         }
+        SystemAppearance(!isDark)
         MaterialTheme(
             colorScheme = colors,
             content = content

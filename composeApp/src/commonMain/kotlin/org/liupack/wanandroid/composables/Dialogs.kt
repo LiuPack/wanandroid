@@ -15,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,10 +70,14 @@ fun MessageDialog(isVisibility: Boolean, message: String, hide: () -> Unit = {})
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error
                         )
-                        Text(text = "温馨提示", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            text = "温馨提示",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = contentColorFor(MaterialTheme.colorScheme.surface)
+                        )
                     }
                     Box(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
-                        Text(message)
+                        Text(message, color = contentColorFor(MaterialTheme.colorScheme.surface))
                     }
                     TextButton(onClick = {
                         isShow = false

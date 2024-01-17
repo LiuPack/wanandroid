@@ -13,6 +13,7 @@ import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -98,10 +99,10 @@ private fun ProjectScreen(navigator: Navigator) {
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                        actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                        navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
                     ),
                 )
             },

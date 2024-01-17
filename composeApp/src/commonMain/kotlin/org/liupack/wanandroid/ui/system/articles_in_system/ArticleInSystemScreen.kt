@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,8 +44,16 @@ private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?
     val viewModel = koinViewModel(ArticleInSystemViewModel::class) { parametersOf(id) }
     val articleState = viewModel.articleState.collectAsLazyPagingItems()
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        TopAppBar(title = { Text(title ?: "文章") },
-            navigationIcon = { IconBackButton(onClick = { navigator.goBack() }) })
+        TopAppBar(
+            title = { Text(title ?: "文章") },
+            navigationIcon = { IconBackButton(onClick = { navigator.goBack() }) },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+            )
+        )
     }, content = { paddingValues ->
         PagingFullLoadLayout(modifier = Modifier.fillMaxSize()
             .padding(top = paddingValues.calculateTopPadding()),

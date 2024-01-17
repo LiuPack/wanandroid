@@ -22,7 +22,7 @@ import org.liupack.wanandroid.model.entity.HomeArticleItemData
 fun ArticleItem(data: HomeArticleItemData, onClick: (HomeArticleItemData) -> Unit = {}) {
     Column(
         modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large)
-            .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.large)
             .clickable { onClick.invoke(data) }.padding(12.dp).clipToBounds(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
