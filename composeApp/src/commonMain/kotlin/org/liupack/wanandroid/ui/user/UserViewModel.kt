@@ -16,6 +16,7 @@ import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserNavigator
 import org.liupack.wanandroid.network.exception.DataResultException
+import org.liupack.wanandroid.openUrl
 import org.liupack.wanandroid.platform.settings
 
 class UserViewModel(private val repository: Repository) : ViewModel() {
@@ -48,6 +49,10 @@ class UserViewModel(private val repository: Repository) : ViewModel() {
 
             UserAction.Refresh -> {
                 userInfo()
+            }
+
+            UserAction.OpenUser -> {
+                openUrl(Constants.projectUserHome)
             }
         }
     }

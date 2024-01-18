@@ -8,4 +8,5 @@ object Constants {
     const val projectUrl = "https://github.com/LiuPack/wanandroid"
     const val projectUserHome = "https://github.com/LiuPack"
     const val darkTheme = "darkTheme"
+    const val isAutoDarkMode = "isAutoDarkMode"
 }

@@ -10,6 +10,7 @@ import org.liupack.wanandroid.ui.main.MainViewModel
 import org.liupack.wanandroid.ui.project.ProjectViewModel
 import org.liupack.wanandroid.ui.project.child.ProjectListViewModel
 import org.liupack.wanandroid.ui.register.RegisterViewModel
+import org.liupack.wanandroid.ui.setting.SettingViewModel
 import org.liupack.wanandroid.ui.system.SystemViewModel
 import org.liupack.wanandroid.ui.system.articles_in_system.ArticleInSystemViewModel
 import org.liupack.wanandroid.ui.user.UserViewModel
@@ -30,4 +31,5 @@ val appModule = module {
     factory { UserCoinCountViewModel(get()) }
     factory { CoinCountRankingViewModel(get()) }
     factory { (cid: Int) -> ArticleInSystemViewModel(cid, get()) }
+    factory { SettingViewModel() }
 }

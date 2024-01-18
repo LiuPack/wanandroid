@@ -10,6 +10,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.russhwolf.settings.contains
 import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.platform.SystemAppearance
 import org.liupack.wanandroid.platform.settings
@@ -81,27 +82,59 @@ private val DarkColors = darkColorScheme(
 )
 internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
 
+internal val LocalThemeMode = compositionLocalOf { mutableStateOf<ThemeMode>(ThemeMode.System) }
+
+sealed class ThemeMode {
+    data object Light : ThemeMode()
+    data object Dark : ThemeMode()
+    data object System : ThemeMode()
+}
+
 @Composable
 fun AppTheme(
+    systemDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val systemIsDark =
-        if (settings.getBooleanOrNull(Constants.darkTheme) == null) isSystemInDarkTheme() else settings.getBoolean(
-            Constants.darkTheme,
-            false
+    val isSystem = if (settings.contains(Constants.isAutoDarkMode)) {
+        settings.getBoolean(Constants.isAutoDarkMode, true)
+    } else {
+        settings.putBoolean(Constants.isAutoDarkMode, true)
+        true
+    }
+    val darkTheme = if (settings.contains(Constants.darkTheme)) {
+        settings.getBoolean(Constants.darkTheme, false)
+    } else {
+        settings.putBoolean(Constants.darkTheme, false)
+        false
+    }
+    val themeMode = remember {
+        mutableStateOf(
+            if (isSystem) {
+                ThemeMode.System
+            } else {
+                if (darkTheme) {
+                    ThemeMode.Dark
+                } else {
+                    ThemeMode.Light
+                }
+            }
         )
-    val isDarkState = remember { mutableStateOf(systemIsDark) }
-    CompositionLocalProvider(LocalThemeIsDark provides isDarkState) {
-        val isDark by isDarkState
-        val colors = if (!isDark) {
-            LightColors
-        } else {
-            DarkColors
+    }
+    CompositionLocalProvider(LocalThemeMode provides themeMode) {
+        val currentThemeMode by themeMode
+        val colors = when (currentThemeMode) {
+            ThemeMode.Dark -> DarkColors
+            ThemeMode.Light -> LightColors
+            ThemeMode.System -> if (systemDarkTheme) DarkColors else LightColors
         }
-        SystemAppearance(!isDark)
+        val systemAppearanceMode = when (currentThemeMode) {
+            ThemeMode.Dark -> true
+            ThemeMode.Light -> false
+            ThemeMode.System -> systemDarkTheme
+        }
+        SystemAppearance(!systemAppearanceMode)
         MaterialTheme(
-            colorScheme = colors,
-            content = content
+            colorScheme = colors, content = content
         )
     }
 }

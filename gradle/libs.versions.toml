@@ -6,7 +6,7 @@ androidx-appcompat = "1.6.1"
 androidx-activityCompose = "1.8.2"
 compose-uitooling = "1.5.4"
 composeImageLoader = "1.7.1"
-napier = "2.6.1"
+napier = "2.7.1"
 kotlinx-coroutines = "1.7.3"
 ktor = "2.3.7"
 kotlinx-serialization = "1.6.2"
@@ -19,7 +19,7 @@ koinCompose = "1.1.2"
 composeViews = "1.5.10.1"
 windowsizeMultiplatform = "0.3.2"
 precompose = "1.5.10"
-webview-multiplatform = "1.8.2"
+webview-multiplatform = "1.8.4"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }

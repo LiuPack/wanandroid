@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -38,11 +39,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.BackHandler
+import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.jetbrains.compose.resources.painterResource
-import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.composables.FullUiStateLayout
 import org.liupack.wanandroid.composables.LoadingDialog
 import org.liupack.wanandroid.composables.MessageDialog
@@ -51,7 +52,6 @@ import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
 import org.liupack.wanandroid.model.UiState.Companion.successDataOrNull
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserNavigator
-import org.liupack.wanandroid.openUrl
 import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
 
@@ -70,7 +70,10 @@ private fun UserScreen(navigator: Navigator) {
     val logoutState by viewModel.logout.collectAsState(null)
     if (loginState == true) {
         LaunchedEffect(viewModel.hashCode()) {
-            val result = navigator.navigateForResult(Router.Login.path)
+            val result = navigator.navigateForResult(
+                route = Router.Login.path,
+                options = NavOptions(launchSingleTop = true)
+            )
             if (result == true) {
                 viewModel.dispatch(UserAction.Refresh)
             }
@@ -93,7 +96,7 @@ private fun UserScreen(navigator: Navigator) {
         itemClick = {
             when (it) {
                 UserNavigator.AboutUser -> {
-                    openUrl(Constants.projectUserHome)
+                    viewModel.dispatch(UserAction.OpenUser)
                 }
 
                 UserNavigator.Logout -> {
@@ -101,11 +104,17 @@ private fun UserScreen(navigator: Navigator) {
                 }
 
                 UserNavigator.SystemSetting -> {
-                    navigator.navigate(Router.Setting.path)
+                    navigator.navigate(
+                        route = Router.Setting.path,
+                        options = NavOptions(launchSingleTop = true)
+                    )
                 }
 
                 UserNavigator.UserCoinCount -> {
-                    navigator.navigate(Router.UserCoinCount.path)
+                    navigator.navigate(
+                        route = Router.UserCoinCount.path,
+                        options = NavOptions(launchSingleTop = true)
+                    )
                 }
 
                 UserNavigator.UserCollect -> {}
@@ -171,13 +180,14 @@ private fun UserInfoContent(
                         content = { data ->
                             if (data != null) {
                                 Column(
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier.fillMaxWidth()
+                                        .wrapContentSize().align(Alignment.Center),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     //https://www.iconfont.cn/illustrations/detail?spm=a313x.illustrations_index.i1.d9df05512.6ae13a81mzJ56W&cid=47401
                                     Image(
-                                        painter = painterResource("user_avatar.png"),
+                                        painter = painterResource("android_studio.png"),
                                         contentDescription = null,
                                         modifier = Modifier.padding(vertical = 12.dp).size(50.dp)
                                             .clip(CircleShape).border(

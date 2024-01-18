@@ -1,6 +1,7 @@
 package org.liupack.wanandroid.ui.setting
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,23 +19,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
-import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.composables.IconBackButton
-import org.liupack.wanandroid.platform.settings
 import org.liupack.wanandroid.router.Router
-import org.liupack.wanandroid.theme.LocalThemeIsDark
+import org.liupack.wanandroid.theme.LocalThemeMode
+import org.liupack.wanandroid.theme.ThemeMode
 
 fun RouteBuilder.settingScreen(navigator: Navigator) {
     scene(Router.Setting.path) {
-        SettingScreen(backClick = { navigator.goBack() })
+        val viewModel = koinViewModel(SettingViewModel::class)
+        SettingScreen(
+            backClick = { navigator.goBack() },
+            onSystemChange = { viewModel.saveSystemThemeMode(it) },
+            onDarkChange = { viewModel.saveDarkTheme(it) },
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingScreen(backClick: () -> Unit = {}) {
+private fun SettingScreen(
+    backClick: () -> Unit = {},
+    onSystemChange: (ThemeMode) -> Unit,
+    onDarkChange: (ThemeMode) -> Unit
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -52,24 +62,48 @@ fun SettingScreen(backClick: () -> Unit = {}) {
             )
         },
         content = { paddingValues ->
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-                    .padding(top = paddingValues.calculateTopPadding()),
-            ) {
-                item {
-                    ListItem(
-                        modifier = Modifier.fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface), headlineContent = {
-                            Text("暗色模式")
-                        }, trailingContent = {
-                            var darkTheme by LocalThemeIsDark.current
-                            Switch(checked = darkTheme, onCheckedChange = {
-                                darkTheme = !darkTheme
-                                settings.putBoolean(Constants.darkTheme, darkTheme)
-                            })
-                        })
-                }
-            }
+            SettingContent(
+                paddingValues = paddingValues,
+                onSystemChange = onSystemChange,
+                onDarkChange = onDarkChange
+            )
         },
     )
+}
+
+@Composable
+private fun SettingContent(
+    paddingValues: PaddingValues,
+    onSystemChange: (ThemeMode) -> Unit,
+    onDarkChange: (ThemeMode) -> Unit
+) {
+    var themeMode by LocalThemeMode.current
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+            .padding(top = paddingValues.calculateTopPadding()),
+    ) {
+        item {
+            ListItem(modifier = Modifier.fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface), headlineContent = {
+                Text("跟随系统")
+            }, trailingContent = {
+                Switch(checked = themeMode is ThemeMode.System, onCheckedChange = {
+                    themeMode = if (it) ThemeMode.System else ThemeMode.Light
+                    onSystemChange.invoke(themeMode)
+                })
+            })
+        }
+        item {
+            ListItem(modifier = Modifier.fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface), headlineContent = {
+                Text("暗色模式")
+            }, trailingContent = {
+                Switch(checked = themeMode is ThemeMode.Dark, onCheckedChange = {
+                    themeMode = if (it) ThemeMode.Dark else ThemeMode.Light
+                    onDarkChange.invoke(themeMode)
+
+                }, enabled = themeMode !is ThemeMode.System)
+            })
+        }
+    }
 }

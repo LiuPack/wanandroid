@@ -37,7 +37,6 @@ import org.liupack.wanandroid.composables.ArticleItem
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
-import org.liupack.wanandroid.openUrl
 import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
 
@@ -66,7 +65,9 @@ private fun HomeScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            openUrl(Constants.projectUrl)
+                            val path =
+                                Router.WebView.parametersOf(RouterKey.url to Constants.projectUrl)
+                            navigator.navigate(path, NavOptions(launchSingleTop = true))
                         },
                         content = {
                             Icon(Icons.Outlined.Public, null)
@@ -76,7 +77,7 @@ private fun HomeScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
                     actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                    navigationIconContentColor =contentColorFor(MaterialTheme.colorScheme.background),
+                    navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
                 )
             )
         },

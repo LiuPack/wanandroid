@@ -17,9 +17,7 @@ kotlin {
     }
     jvm()
     listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
+        iosX64(), iosArm64(), iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
             baseName = "ComposeApp"
@@ -37,8 +35,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
-            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-            implementation(compose.components.resources)
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class) implementation(compose.components.resources)
             implementation(libs.composeImageLoader)
             implementation(libs.napier)
             implementation(libs.kotlinx.coroutines.core)
@@ -118,12 +115,33 @@ android {
 
 compose.desktop {
     application {
+
+        buildTypes.release.proguard {
+            configurationFiles.from("compose-desktop.pro")
+        }
+
         mainClass = "MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.liupack.wanandroid.desktopApp"
             packageVersion = "1.0.0"
+            includeAllModules = true
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.withType<JavaExec> {
+        jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
+        jvmArgs(
+            "--add-opens", "java.desktop/java.awt.peer=ALL-UNNAMED"
+        )
+
+        if (System.getProperty("os.name").contains("Mac")) {
+            jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
+            jvmArgs("--add-opens", "java.desktop/sun.lwawt=ALL-UNNAMED")
+            jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
         }
     }
 }
