@@ -21,7 +21,6 @@ import org.koin.core.context.startKoin
 import org.liupack.wanandroid.App
 import org.liupack.wanandroid.model.di.appModule
 import java.awt.Dimension
-import java.io.File
 import kotlin.math.max
 
 fun main() = application {
@@ -38,10 +37,10 @@ fun main() = application {
         var restartRequired by remember { mutableStateOf(false) }
         var downloading by remember { mutableStateOf(0f) }
         var initialized by remember { mutableStateOf(false) }
+        var failedMsg by remember { mutableStateOf("") }
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {
                 KCEF.init(builder = {
-                    installDir(File("kcef-bundle"))
                     progress {
                         onDownloading {
                             downloading = max(it, 0f)
@@ -49,11 +48,10 @@ fun main() = application {
                         onInitialized {
                             initialized = true
                         }
-                    }
-                    settings {
-                        cachePath = File("cache").absolutePath
+                        release(true)
                     }
                 }, onError = {
+                    failedMsg = it?.stackTraceToString().orEmpty()
                     it?.printStackTrace()
                 }, onRestartRequired = {
                     restartRequired = true
@@ -62,7 +60,7 @@ fun main() = application {
         }
         if (restartRequired) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center, content = {
-                Text(text = "Restart required.")
+                Text(text = failedMsg)
             })
         } else {
             if (initialized) {

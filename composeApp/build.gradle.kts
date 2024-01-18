@@ -115,18 +115,26 @@ android {
 
 compose.desktop {
     application {
-
         buildTypes.release.proguard {
             configurationFiles.from("compose-desktop.pro")
         }
-
         mainClass = "MainKt"
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "org.liupack.wanandroid.desktopApp"
+            packageName = "玩 Android"
             packageVersion = "1.0.0"
-            includeAllModules = true
+            macOS {
+                dockName = "玩 Android"
+                setDockNameSameAsPackageName = true
+                bundleID = "org.liupack.wanandroid"
+                iconFile.set(project.file("launcher/icon.icns"))
+            }
+            linux {
+                iconFile.set(project.file("launcher/icon.png"))
+            }
+            windows {
+                iconFile.set(project.file("launcher/icon.ico"))
+            }
         }
     }
 }
