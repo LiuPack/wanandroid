@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.liupack.wanandroid.model.datasource.ArticleInSystemSource
+import org.liupack.wanandroid.model.datasource.ArticleInWechatAccountSource
 import org.liupack.wanandroid.model.datasource.CoinCountRankingSource
 import org.liupack.wanandroid.model.datasource.HomeArticleSource
 import org.liupack.wanandroid.model.datasource.ProjectListSource
@@ -26,6 +27,7 @@ import org.liupack.wanandroid.model.entity.UserCoinCountData
 import org.liupack.wanandroid.model.entity.UserCoinCountListData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserInfoData
+import org.liupack.wanandroid.model.entity.WechatAccountSortData
 import org.liupack.wanandroid.network.DataResult.Companion.catchData
 import org.liupack.wanandroid.network.NetworkConfig
 import org.liupack.wanandroid.network.connect
@@ -81,7 +83,9 @@ class DefaultRepository : Repository {
     override fun articles(): Flow<PagingData<HomeArticleItemData>> {
         return Pager(config = PagingConfig(
             initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
-        ), pagingSourceFactory = { HomeArticleSource() }).flow.flowOn(Dispatchers.IO)
+        ), pagingSourceFactory = {
+            HomeArticleSource()
+        }).flow.flowOn(Dispatchers.IO)
     }
 
     override fun projectSort(): Flow<List<ProjectSortData>> {
@@ -95,7 +99,9 @@ class DefaultRepository : Repository {
     override fun projectListFromSort(id: Int): Flow<PagingData<HomeArticleItemData>> {
         return Pager(config = PagingConfig(
             initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
-        ), pagingSourceFactory = { ProjectListSource(id) }).flow.flowOn(Dispatchers.IO)
+        ), pagingSourceFactory = {
+            ProjectListSource(id)
+        }).flow.flowOn(Dispatchers.IO)
     }
 
     override fun systemBaseList(): Flow<List<SystemBaseData>> {
@@ -117,18 +123,40 @@ class DefaultRepository : Repository {
     override fun userCoinCountList(): Flow<PagingData<UserCoinCountListData>> {
         return Pager(config = PagingConfig(
             initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
-        ), pagingSourceFactory = { UserCoinCountListSource() }).flow.flowOn(Dispatchers.IO)
+        ), pagingSourceFactory = {
+            UserCoinCountListSource()
+        }).flow.flowOn(Dispatchers.IO)
     }
 
     override fun coinCountRanking(): Flow<PagingData<CoinCountRankingData>> {
         return Pager(config = PagingConfig(
             initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
-        ), pagingSourceFactory = { CoinCountRankingSource() }).flow.flowOn(Dispatchers.IO)
+        ), pagingSourceFactory = {
+            CoinCountRankingSource()
+        }).flow.flowOn(Dispatchers.IO)
     }
 
     override fun articleInSystem(cid: Int): Flow<PagingData<HomeArticleItemData>> {
         return Pager(config = PagingConfig(
             initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
-        ), pagingSourceFactory = { ArticleInSystemSource(cid) }).flow.flowOn(Dispatchers.IO)
+        ), pagingSourceFactory = {
+            ArticleInSystemSource(cid)
+        }).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun wechatAccountSort(): Flow<List<WechatAccountSortData>> {
+        return flow {
+            val result = connect().get(NetworkConfig.wechatAccountSortApi)
+                .dataResultBody<List<WechatAccountSortData>>().catchData.orEmpty()
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun articleInWechatAccount(id: Int): Flow<PagingData<HomeArticleItemData>> {
+        return Pager(config = PagingConfig(
+            initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
+        ), pagingSourceFactory = {
+            ArticleInWechatAccountSource(id)
+        }).flow.flowOn(Dispatchers.IO)
     }
 }

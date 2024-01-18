@@ -12,6 +12,7 @@ import org.liupack.wanandroid.model.entity.UserCoinCountData
 import org.liupack.wanandroid.model.entity.UserCoinCountListData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserInfoData
+import org.liupack.wanandroid.model.entity.WechatAccountSortData
 
 interface Repository {
 
@@ -105,5 +106,26 @@ interface Repository {
      */
     fun coinCountRanking(): Flow<PagingData<CoinCountRankingData>>
 
+    /**
+     * 体系文章
+     *
+     * @param cid 体系 id
+     * @return
+     */
     fun articleInSystem(cid: Int): Flow<PagingData<HomeArticleItemData>>
+
+    /**
+     * 公众号列表
+     *
+     * @return
+     */
+    fun wechatAccountSort(): Flow<List<WechatAccountSortData>>
+
+    /**
+     * 某个公众号的文章
+     *
+     * @param id 公众号 id
+     * @return
+     */
+    fun articleInWechatAccount(id: Int): Flow<PagingData<HomeArticleItemData>>
 }

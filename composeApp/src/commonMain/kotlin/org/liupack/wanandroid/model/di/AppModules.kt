@@ -16,6 +16,7 @@ import org.liupack.wanandroid.ui.system.articles_in_system.ArticleInSystemViewMo
 import org.liupack.wanandroid.ui.user.UserViewModel
 import org.liupack.wanandroid.ui.user_coincount.UserCoinCountViewModel
 import org.liupack.wanandroid.ui.wechat_account.WechatAccountViewModel
+import org.liupack.wanandroid.ui.wechat_account.child.ArticleInWechatAccountViewModel
 
 val appModule = module {
     single<Repository> { DefaultRepository() }
@@ -32,4 +33,6 @@ val appModule = module {
     factory { CoinCountRankingViewModel(get()) }
     factory { (cid: Int) -> ArticleInSystemViewModel(cid, get()) }
     factory { SettingViewModel() }
+    factory { WechatAccountViewModel(get()) }
+    factory { (id: Int) -> ArticleInWechatAccountViewModel(id, get()) }
 }

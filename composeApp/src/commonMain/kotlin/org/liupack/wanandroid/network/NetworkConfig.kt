@@ -35,7 +35,15 @@ object NetworkConfig {
 
     const val articleInSystemApi = "article/list/{page}/json"
 
+    const val wechatAccountSortApi = "wxarticle/chapters/json"
+
+    const val wechatAccountArticleApi = "wxarticle/list/{id}/{page}/json"
+
     internal fun String.replaceRealPageApi(page: Int): String {
         return this.replace("{page}", page.toString())
+    }
+
+    internal fun String.replaceRealIdAndPageApi(id: Int, page: Int): String {
+        return this.replace("{id}", id.toString()).replace("{page}", page.toString())
     }
 }
