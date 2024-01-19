@@ -30,6 +30,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.core.context.startKoin
 import org.liupack.wanandroid.App
 import org.liupack.wanandroid.model.di.appModule
+import wanandroid.composeApp.BuildConfig
 import java.awt.Dimension
 import java.io.File
 import java.math.RoundingMode
@@ -51,11 +52,16 @@ fun main() = application {
         var initialized by remember { mutableStateOf(false) }
         var failedMsg by remember { mutableStateOf("") }
         var rootPath by remember { mutableStateOf("") }
+        val isDebug = BuildConfig.DEBUG
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {
-                val rootFolder =
-                    Tooling.getApplicationWriteableRootFolder("wanandroid") ?: File("./")
-                val kcefInstallDir = File(rootFolder, "kcef-bundle")
+                val kcefInstallDir = if (isDebug) {
+                    File("kcef-bundle")
+                } else {
+                    val rootFolder =
+                        Tooling.getApplicationWriteableRootFolder("wanandroid") ?: File("./")
+                    File(rootFolder, "kcef-bundle")
+                }
                 rootPath = kcefInstallDir.absolutePath
                 KCEF.init(builder = {
                     installDir(kcefInstallDir)
@@ -95,6 +101,14 @@ fun main() = application {
                                 }
                                 withStyle(SpanStyle()) {
                                     append(rootPath)
+                                }
+                                withStyle(ParagraphStyle()) {
+                                    append("模式：")
+                                    if (isDebug) {
+                                        append("Debug")
+                                    } else {
+                                        append("Release")
+                                    }
                                 }
                             },
                             modifier = Modifier.padding(12.dp).fillMaxWidth()
