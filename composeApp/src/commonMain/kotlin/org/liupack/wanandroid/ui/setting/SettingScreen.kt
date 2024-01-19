@@ -22,7 +22,9 @@ import androidx.compose.ui.Modifier
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.composables.IconBackButton
+import org.liupack.wanandroid.platform.settings
 import org.liupack.wanandroid.router.Router
 import org.liupack.wanandroid.theme.LocalThemeMode
 import org.liupack.wanandroid.theme.ThemeMode
@@ -88,7 +90,15 @@ private fun SettingContent(
                 Text("跟随系统")
             }, trailingContent = {
                 Switch(checked = themeMode is ThemeMode.System, onCheckedChange = {
-                    themeMode = if (it) ThemeMode.System else ThemeMode.Light
+                    themeMode = if (it) {
+                        ThemeMode.System
+                    } else {
+                        if (!settings.getBoolean(Constants.darkTheme, false)) {
+                            ThemeMode.Light
+                        } else {
+                            ThemeMode.Dark
+                        }
+                    }
                     onSystemChange.invoke(themeMode)
                 })
             })
@@ -99,9 +109,12 @@ private fun SettingContent(
                 Text("暗色模式")
             }, trailingContent = {
                 Switch(checked = themeMode is ThemeMode.Dark, onCheckedChange = {
-                    themeMode = if (it) ThemeMode.Dark else ThemeMode.Light
+                    themeMode = if (it) {
+                        ThemeMode.Dark
+                    } else {
+                        ThemeMode.Light
+                    }
                     onDarkChange.invoke(themeMode)
-
                 }, enabled = themeMode !is ThemeMode.System)
             })
         }
