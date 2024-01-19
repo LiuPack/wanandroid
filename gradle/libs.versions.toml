@@ -20,6 +20,7 @@ composeViews = "1.5.10.1"
 windowsizeMultiplatform = "0.3.2"
 precompose = "1.5.10"
 webview-multiplatform = "1.8.4"
+kcef-tool = "1.1.0"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
@@ -48,6 +49,7 @@ precompose-core = { module = "moe.tlaster:precompose", version.ref = "precompose
 precompose-viewmodel = { module = "moe.tlaster:precompose-viewmodel", version.ref = "precompose" }
 precompose-koin = { module = "moe.tlaster:precompose-koin", version.ref = "precompose" }
 webview-multiplatform = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "webview-multiplatform" }
+kcef-tool = { module = "dev.datlag.tooling:tooling", version.ref = "kcef-tool" }
 
 [plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

@@ -56,6 +56,7 @@ kotlin {
             implementation(libs.precompose.koin)
             implementation(libs.precompose.viewmodel)
             implementation(libs.webview.multiplatform)
+            implementation(libs.kcef.tool)
         }
 
         commonTest.dependencies {
@@ -115,6 +116,15 @@ android {
 
 compose.desktop {
     application {
+        jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+        jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
+        jvmArgs("--add-opens", "java.desktop/sun.java2d=ALL-UNNAMED")
+        jvmArgs("--add-opens", "java.desktop/java.awt.peer=ALL-UNNAMED")
+
+        if (System.getProperty("os.name").contains("Mac")) {
+            jvmArgs("--add-opens", "java.desktop/sun.lwawt=ALL-UNNAMED")
+            jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
+        }
         buildTypes.release.proguard {
             configurationFiles.from("compose-desktop.pro")
         }
@@ -135,21 +145,6 @@ compose.desktop {
             windows {
                 iconFile.set(project.file("launcher/icon.ico"))
             }
-        }
-    }
-}
-
-afterEvaluate {
-    tasks.withType<JavaExec> {
-        jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
-        jvmArgs(
-            "--add-opens", "java.desktop/java.awt.peer=ALL-UNNAMED"
-        )
-
-        if (System.getProperty("os.name").contains("Mac")) {
-            jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
-            jvmArgs("--add-opens", "java.desktop/sun.lwawt=ALL-UNNAMED")
-            jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
         }
     }
 }
