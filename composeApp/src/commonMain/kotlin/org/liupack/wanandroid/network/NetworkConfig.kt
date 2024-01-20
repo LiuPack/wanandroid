@@ -45,6 +45,12 @@ object NetworkConfig {
 
     const val deleteUserShareArticle = "lg/user_article/delete/{id}/json"
 
+    const val userFavoriteArticles = "lg/collect/list/{page}/json"
+
+    const val favoriteArticle = "lg/collect/{id}/json"
+
+    const val unFavoriteArticle = "lg/uncollect_originId/{id}/json"
+
     internal fun String.replaceRealIdApi(id: Int): String {
         return this.replace("{id}", id.toString())
     }

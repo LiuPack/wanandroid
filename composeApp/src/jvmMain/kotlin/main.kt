@@ -55,6 +55,7 @@ fun main() = application {
         val isDebug = BuildConfig.DEBUG
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {
+                //https://github.com/DatL4g/KCEF/issues/2
                 val kcefInstallDir = if (isDebug) {
                     File("kcef-bundle")
                 } else {

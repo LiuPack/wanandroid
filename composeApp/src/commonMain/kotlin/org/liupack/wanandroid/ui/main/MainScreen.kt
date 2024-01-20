@@ -44,7 +44,8 @@ fun MainScreen() {
     val navigator = rememberNavigator()
     val viewModel = koinViewModel(MainViewModel::class)
     val currentEntry by navigator.currentEntry.collectAsState(null)
-    val isNavigation = viewModel.navigationList.any { it.router.path == currentEntry?.path }
+    val isNavigation =
+        viewModel.bottomNavigatorDataLists.any { it.router.path == currentEntry?.path }
     Column(modifier = Modifier.fillMaxSize()) {
         NavHost(navigator = navigator,
             initialRoute = Router.Splash.path,
@@ -79,7 +80,7 @@ fun MainScreen() {
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = contentColorFor(MaterialTheme.colorScheme.background)
             ) {
-                viewModel.navigationList.forEach {
+                viewModel.bottomNavigatorDataLists.forEach {
                     NavigationBarItem(selected = currentEntry?.path == it.router.path, onClick = {
                         navigator.navigate(
                             route = it.router.path, options = NavOptions(launchSingleTop = true)

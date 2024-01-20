@@ -1,30 +1,36 @@
 package org.liupack.wanandroid.ui.home
 
-import androidx.compose.foundation.lazy.LazyListState
-import app.cash.paging.PagingData
 import app.cash.paging.cachedIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.model.Repository
-import org.liupack.wanandroid.model.entity.HomeArticleItemData
+import org.liupack.wanandroid.model.usecase.CancelFavoriteArticleUseCase
+import org.liupack.wanandroid.model.usecase.FavoriteArticleUseCase
 import org.liupack.wanandroid.openUrl
 
-class HomeViewModel(private val repository: Repository) : ViewModel() {
+class HomeViewModel(
+    private val repository: Repository,
+    private val favoriteArticleUseCase: FavoriteArticleUseCase,
+    private val cancelFavoriteArticleUseCase: CancelFavoriteArticleUseCase
+) : ViewModel() {
 
-    var lazyListState = LazyListState()
+    val articles = repository.articles().cachedIn(viewModelScope)
 
-    private val mPagingState = MutableStateFlow<PagingData<HomeArticleItemData>>(PagingData.empty())
-    val pagingState = mPagingState.asStateFlow()
+    private val mFavoriteState = MutableStateFlow<Boolean?>(null)
+    val favoriteState = mFavoriteState.asStateFlow()
 
     fun dispatch(action: HomeAction) {
         viewModelScope.launch {
             when (action) {
+
                 is HomeAction.Refresh -> {
 
                 }
@@ -36,17 +42,40 @@ class HomeViewModel(private val repository: Repository) : ViewModel() {
                 is HomeAction.OpenBanner -> {
                     openUrl(action.url)
                 }
+
+                is HomeAction.Favorite -> {
+                    favoriteArticle(action.data.id)
+                }
+
+                is HomeAction.CancelFavorite -> {
+                    cancelFavoriteArticle(action.data.id)
+                }
             }
         }
     }
 
-    val articles = repository.articles().cachedIn(viewModelScope)
-
-    private fun articles() {
+    private fun favoriteArticle(id: Int) {
         viewModelScope.launch {
-            repository.articles().cachedIn(viewModelScope).map {
-                mPagingState.value = it
+            favoriteArticleUseCase(id).onStart {
+                mFavoriteState.emit(null)
+            }.onEach {
+                mFavoriteState.emit(true)
+            }.catch {
+                mFavoriteState.emit(false)
             }.launchIn(viewModelScope)
         }
     }
+
+    private fun cancelFavoriteArticle(id: Int) {
+        viewModelScope.launch {
+            cancelFavoriteArticleUseCase(id).onStart {
+                mFavoriteState.emit(null)
+            }.onEach {
+                mFavoriteState.emit(true)
+            }.catch {
+                mFavoriteState.emit(false)
+            }.launchIn(viewModelScope)
+        }
+    }
+
 }

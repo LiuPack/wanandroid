@@ -16,7 +16,6 @@ import app.cash.paging.LoadStateError
 import app.cash.paging.LoadStateLoading
 import app.cash.paging.LoadStateNotLoading
 import app.cash.paging.compose.LazyPagingItems
-import org.liupack.wanandroid.common.Logger
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
@@ -27,11 +26,16 @@ fun <T : Any> PagingFullLoadLayout(
     pagingState: LazyPagingItems<T> = collectAsLazyEmptyPagingItems(),
     content: @Composable BoxScope.() -> Unit
 ) {
-    Logger.d(pagingState.loadState.refresh.toString())
     when (pagingState.loadState.refresh) {
         is LoadStateLoading -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+            if (pagingState.itemCount == 0) {
+                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    content()
+                }
             }
         }
 

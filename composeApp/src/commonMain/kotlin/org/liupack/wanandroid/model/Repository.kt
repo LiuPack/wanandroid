@@ -10,6 +10,7 @@ import org.liupack.wanandroid.model.entity.ProjectSortData
 import org.liupack.wanandroid.model.entity.SystemBaseData
 import org.liupack.wanandroid.model.entity.UserCoinCountData
 import org.liupack.wanandroid.model.entity.UserCoinCountListData
+import org.liupack.wanandroid.model.entity.UserFavoriteArticleData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.model.entity.WechatAccountSortData
@@ -152,4 +153,27 @@ interface Repository {
      * @return
      */
     fun deleteUserShareArticle(id: Int): Flow<String?>
+
+    /**
+     * 用户收藏的文章
+     *
+     * @return
+     */
+    fun userFavoriteArticles(): Flow<PagingData<UserFavoriteArticleData>>
+
+    /**
+     * 收藏文章
+     *
+     * @param id
+     * @return
+     */
+    fun favoriteArticle(id: Int): Flow<String?>
+
+    /**
+     * 取消收藏
+     *
+     * @param id
+     * @return
+     */
+    fun cancelFavoriteArticle(id: Int): Flow<String?>
 }

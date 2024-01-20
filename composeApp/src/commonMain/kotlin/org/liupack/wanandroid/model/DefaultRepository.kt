@@ -5,6 +5,7 @@ import app.cash.paging.Pager
 import app.cash.paging.PagingData
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
+import io.ktor.client.request.post
 import io.ktor.http.parameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -17,6 +18,7 @@ import org.liupack.wanandroid.model.datasource.CoinCountRankingSource
 import org.liupack.wanandroid.model.datasource.HomeArticleSource
 import org.liupack.wanandroid.model.datasource.ProjectListSource
 import org.liupack.wanandroid.model.datasource.UserCoinCountListSource
+import org.liupack.wanandroid.model.datasource.UserFavoriteArticlesSource
 import org.liupack.wanandroid.model.datasource.UserShareArticlesSource
 import org.liupack.wanandroid.model.entity.BannerData
 import org.liupack.wanandroid.model.entity.CoinCountRankingData
@@ -26,6 +28,7 @@ import org.liupack.wanandroid.model.entity.ProjectSortData
 import org.liupack.wanandroid.model.entity.SystemBaseData
 import org.liupack.wanandroid.model.entity.UserCoinCountData
 import org.liupack.wanandroid.model.entity.UserCoinCountListData
+import org.liupack.wanandroid.model.entity.UserFavoriteArticleData
 import org.liupack.wanandroid.model.entity.UserFullInfoData
 import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.model.entity.WechatAccountSortData
@@ -185,6 +188,30 @@ class DefaultRepository : Repository {
             val result =
                 connect().submitForm(url = NetworkConfig.deleteUserShareArticle.replaceRealIdApi(id))
                     .dataResultBody<String>().catchData
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun userFavoriteArticles(): Flow<PagingData<UserFavoriteArticleData>> {
+        return Pager(config = PagingConfig(
+            initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
+        ), pagingSourceFactory = {
+            UserFavoriteArticlesSource()
+        }).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun favoriteArticle(id: Int): Flow<String?> {
+        return flow {
+            val result = connect().submitForm(NetworkConfig.favoriteArticle.replaceRealIdApi(id))
+                .dataResultBody<String>().catchData
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun cancelFavoriteArticle(id: Int): Flow<String?> {
+        return flow {
+            val result = connect().post(NetworkConfig.unFavoriteArticle.replaceRealIdApi(id))
+                .dataResultBody<String>().catchData
             emit(result)
         }.flowOn(Dispatchers.IO)
     }

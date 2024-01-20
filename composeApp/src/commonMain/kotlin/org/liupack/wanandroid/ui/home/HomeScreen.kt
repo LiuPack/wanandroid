@@ -19,6 +19,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.cash.paging.compose.LazyPagingItems
@@ -31,6 +33,7 @@ import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.Constants
+import org.liupack.wanandroid.common.Logger
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.ArticleItem
@@ -46,7 +49,22 @@ fun RouteBuilder.homeScreen(navigator: Navigator) {
         val viewModel = koinViewModel(HomeViewModel::class)
         val articleState = viewModel.articles.collectAsLazyPagingItems()
         val lazyListState = rememberLazyListState()
-        HomeScreen(navigator, articleState, lazyListState)
+        val favoriteState by viewModel.favoriteState.collectAsState(null)
+        if (favoriteState != null) {
+            Logger.i("收藏状态：$favoriteState")
+            articleState.refresh()
+        }
+        HomeScreen(
+            navigator = navigator,
+            lazyPagingItems = articleState,
+            lazyListState = lazyListState,
+            addFavorite = {
+                viewModel.dispatch(HomeAction.Favorite(it))
+            },
+            cancelFavorite = {
+                viewModel.dispatch(HomeAction.CancelFavorite(it))
+            }
+        )
     }
 }
 
@@ -56,6 +74,8 @@ private fun HomeScreen(
     navigator: Navigator,
     lazyPagingItems: LazyPagingItems<HomeArticleItemData>,
     lazyListState: LazyListState,
+    addFavorite: (HomeArticleItemData) -> Unit = {},
+    cancelFavorite: (HomeArticleItemData) -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -103,6 +123,12 @@ private fun HomeScreen(
                                         route = path,
                                         options = NavOptions(launchSingleTop = true)
                                     )
+                                }, onFavoriteClick = { favoriteState ->
+                                    if (favoriteState) {
+                                        addFavorite.invoke(item)
+                                    } else {
+                                        cancelFavorite.invoke(item)
+                                    }
                                 })
                             }
                         })
