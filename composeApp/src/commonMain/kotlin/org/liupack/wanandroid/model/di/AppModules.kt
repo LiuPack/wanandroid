@@ -15,6 +15,9 @@ import org.liupack.wanandroid.ui.system.SystemViewModel
 import org.liupack.wanandroid.ui.system.articles_in_system.ArticleInSystemViewModel
 import org.liupack.wanandroid.ui.user.UserViewModel
 import org.liupack.wanandroid.ui.user_coincount.UserCoinCountViewModel
+import org.liupack.wanandroid.ui.user_favorite.UserFavoriteViewModel
+import org.liupack.wanandroid.ui.user_shared.UserSharedViewModel
+import org.liupack.wanandroid.ui.user_shared.add_shared.UserAddSharedViewModel
 import org.liupack.wanandroid.ui.wechat_account.WechatAccountViewModel
 import org.liupack.wanandroid.ui.wechat_account.child.ArticleInWechatAccountViewModel
 
@@ -35,4 +38,7 @@ val appModule = module {
     factory { SettingViewModel() }
     factory { WechatAccountViewModel(get()) }
     factory { (id: Int) -> ArticleInWechatAccountViewModel(id, get()) }
+    factory { UserFavoriteViewModel(get()) }
+    factory { UserSharedViewModel(get()) }
+    factory { UserAddSharedViewModel(get()) }
 }

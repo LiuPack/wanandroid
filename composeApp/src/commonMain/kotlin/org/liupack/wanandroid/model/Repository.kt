@@ -128,4 +128,28 @@ interface Repository {
      * @return
      */
     fun articleInWechatAccount(id: Int): Flow<PagingData<HomeArticleItemData>>
+
+    /**
+     * 我的分享文章
+     *
+     * @return
+     */
+    fun userShareArticles(): Flow<PagingData<HomeArticleItemData>>
+
+    /**
+     * 添加分享的文章
+     *
+     * @param title 标题
+     * @param link 链接
+     * @return
+     */
+    fun userAddSharedArticle(title: String, link: String): Flow<String?>
+
+    /**
+     * 删除分享的文章
+     *
+     * @param id
+     * @return
+     */
+    fun deleteUserShareArticle(id: Int): Flow<String?>
 }

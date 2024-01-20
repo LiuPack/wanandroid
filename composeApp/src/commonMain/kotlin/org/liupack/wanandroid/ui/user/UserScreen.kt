@@ -117,10 +117,22 @@ private fun UserScreen(navigator: Navigator) {
                     )
                 }
 
-                UserNavigator.UserCollect -> {}
-                UserNavigator.UserShared -> {}
+                UserNavigator.UserFavorite -> {
+                    navigator.navigate(
+                        route = Router.UserFavorite.path,
+                        options = NavOptions(launchSingleTop = true)
+                    )
+                }
+
+                UserNavigator.UserShared -> {
+                    navigator.navigate(
+                        route = Router.UserShared.path,
+                        options = NavOptions(launchSingleTop = true)
+                    )
+                }
             }
-        })
+        },
+    )
 }
 
 @Composable

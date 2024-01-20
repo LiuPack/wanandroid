@@ -17,6 +17,7 @@ import org.liupack.wanandroid.model.datasource.CoinCountRankingSource
 import org.liupack.wanandroid.model.datasource.HomeArticleSource
 import org.liupack.wanandroid.model.datasource.ProjectListSource
 import org.liupack.wanandroid.model.datasource.UserCoinCountListSource
+import org.liupack.wanandroid.model.datasource.UserShareArticlesSource
 import org.liupack.wanandroid.model.entity.BannerData
 import org.liupack.wanandroid.model.entity.CoinCountRankingData
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
@@ -30,6 +31,7 @@ import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.model.entity.WechatAccountSortData
 import org.liupack.wanandroid.network.DataResult.Companion.catchData
 import org.liupack.wanandroid.network.NetworkConfig
+import org.liupack.wanandroid.network.NetworkConfig.replaceRealIdApi
 import org.liupack.wanandroid.network.connect
 import org.liupack.wanandroid.network.dataResultBody
 
@@ -158,5 +160,32 @@ class DefaultRepository : Repository {
         ), pagingSourceFactory = {
             ArticleInWechatAccountSource(id)
         }).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun userShareArticles(): Flow<PagingData<HomeArticleItemData>> {
+        return Pager(config = PagingConfig(
+            initialLoadSize = 10, pageSize = 20, prefetchDistance = 1
+        ), pagingSourceFactory = {
+            UserShareArticlesSource()
+        }).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun userAddSharedArticle(title: String, link: String): Flow<String?> {
+        return flow {
+            val result = connect().submitForm(NetworkConfig.userAddShareArticle, parameters {
+                append("title", title)
+                append("link", link)
+            }).dataResultBody<String>().catchData
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun deleteUserShareArticle(id: Int): Flow<String?> {
+        return flow {
+            val result =
+                connect().submitForm(url = NetworkConfig.deleteUserShareArticle.replaceRealIdApi(id))
+                    .dataResultBody<String>().catchData
+            emit(result)
+        }.flowOn(Dispatchers.IO)
     }
 }

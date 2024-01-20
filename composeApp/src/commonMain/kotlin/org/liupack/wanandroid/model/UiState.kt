@@ -2,6 +2,11 @@ package org.liupack.wanandroid.model
 
 import org.liupack.wanandroid.network.exception.LoginExpiredException
 
+typealias UiStateLoading = UiState.Loading
+typealias UiStateException = UiState.Exception
+typealias UiStateFailed = UiState.Failed
+typealias UiStateSuccess<T> = UiState.Success<T>
+
 sealed class UiState<out T> {
     data object Loading : UiState<Nothing>()
 

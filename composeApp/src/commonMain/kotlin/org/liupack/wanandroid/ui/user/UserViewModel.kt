@@ -31,7 +31,7 @@ class UserViewModel(private val repository: Repository) : ViewModel() {
     val userNavigator = listOf(
         UserNavigator.UserCoinCount,
         UserNavigator.UserShared,
-        UserNavigator.UserCollect,
+        UserNavigator.UserFavorite,
         UserNavigator.AboutUser,
         UserNavigator.SystemSetting,
         UserNavigator.Logout

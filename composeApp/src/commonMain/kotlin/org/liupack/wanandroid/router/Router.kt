@@ -1,51 +1,61 @@
 package org.liupack.wanandroid.router
 
-import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
 
-@Stable
+
+@Serializable
 sealed class Router(val path: String) {
-    @Stable
+    @Serializable
     data object Splash : Router("/splash")
 
-    @Stable
+    @Serializable
     data object Main : Router("/main")
 
-    @Stable
+    @Serializable
     data object Login : Router("/login")
 
-    @Stable
+    @Serializable
     data object Register : Router("/register")
 
-    @Stable
+    @Serializable
     data object Home : Router("/home")
 
-    @Stable
+    @Serializable
     data object System : Router("/system")
 
-    @Stable
+    @Serializable
     data object WechatAccount : Router("/wechat_account")
 
-    @Stable
+    @Serializable
     data object Project : Router("/project")
 
-    @Stable
+    @Serializable
     data object ProjectList : Router("/project_list")
 
-    @Stable
+    @Serializable
     data object User : Router("/user")
 
-    @Stable
+    @Serializable
     data object CoinCountRanking : Router("/coin_count_ranking")
 
-    @Stable
+    @Serializable
     data object ArticleInSystem : Router("/article_in_system")
 
-    @Stable
+    @Serializable
     data object UserCoinCount : Router("/user_coin_count")
 
-    @Stable
+    @Serializable
     data object WebView : Router("/web_view_content")
 
-    @Stable
+    @Serializable
     data object Setting : Router("/setting")
+
+    @Serializable
+    data object UserFavorite : Router("/user_favorite")
+
+    @Serializable
+    data object UserShared : Router("/user_shared")
+
+    @Serializable
+    data object UserAddShared : Router("/user_add_shared")
 }

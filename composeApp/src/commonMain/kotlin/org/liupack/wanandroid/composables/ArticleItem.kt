@@ -1,7 +1,8 @@
 package org.liupack.wanandroid.composables
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,12 +19,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ArticleItem(data: HomeArticleItemData, onClick: (HomeArticleItemData) -> Unit = {}) {
+fun ArticleItem(
+    modifier: Modifier = Modifier,
+    data: HomeArticleItemData,
+    onLongClick: (HomeArticleItemData) -> Unit = {},
+    onClick: (HomeArticleItemData) -> Unit = {}
+) {
     Column(
-        modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large)
+        modifier = modifier.fillMaxWidth().clip(MaterialTheme.shapes.large)
             .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.large)
-            .clickable { onClick.invoke(data) }.padding(12.dp).clipToBounds(),
+            .combinedClickable(
+                onLongClick = { onLongClick.invoke(data) },
+                onClick = { onClick.invoke(data) })
+            .padding(12.dp).clipToBounds(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(

@@ -68,7 +68,7 @@ private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?
                             itemContent = { index ->
                                 val data = articleState[index]
                                 if (data != null) {
-                                    ArticleItem(data, onClick = {
+                                    ArticleItem(data = data, onClick = {
                                         val path =
                                             Router.WebView.parametersOf(RouterKey.url to it.link)
                                         navigator.navigate(path)

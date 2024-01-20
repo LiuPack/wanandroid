@@ -47,11 +47,11 @@ fun <T : Any> PagingFullLoadLayout(
 
         is LoadStateNotLoading -> {
             if (pagingState.itemCount == 0) {
-                Box(modifier = modifier.fillMaxSize()) {
+                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("没有数据")
                 }
             } else {
-                Box(modifier = modifier.fillMaxSize()) {
+                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     content()
                 }
             }
@@ -134,7 +134,7 @@ fun <T> FullUiStateLayout(
             }
 
             is UiState.Success -> {
-                Box(modifier = modifier.fillMaxSize()) {
+                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     content(uiState.data)
                 }
             }
