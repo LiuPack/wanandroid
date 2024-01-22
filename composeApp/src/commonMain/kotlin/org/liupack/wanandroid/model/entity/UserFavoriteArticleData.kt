@@ -29,7 +29,7 @@ data class UserFavoriteArticleData(
     @SerialName("origin")
     val origin: String?,
     @SerialName("originId")
-    val originId: Int?,
+    val originId: Int,
     @SerialName("publishTime")
     val publishTime: Long?,
     @SerialName("title")

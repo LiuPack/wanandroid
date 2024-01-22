@@ -4,6 +4,7 @@ import org.koin.dsl.module
 import org.liupack.wanandroid.model.DefaultRepository
 import org.liupack.wanandroid.model.Repository
 import org.liupack.wanandroid.model.usecase.CancelFavoriteArticleUseCase
+import org.liupack.wanandroid.model.usecase.CancelUserFavoriteArticleUseCase
 import org.liupack.wanandroid.model.usecase.FavoriteArticleUseCase
 import org.liupack.wanandroid.ui.coin_count_ranking.CoinCountRankingViewModel
 import org.liupack.wanandroid.ui.home.HomeViewModel
@@ -27,6 +28,7 @@ val appModule = module {
     single<Repository> { DefaultRepository() }
     single { FavoriteArticleUseCase(get()) }
     single { CancelFavoriteArticleUseCase(get()) }
+    single { CancelUserFavoriteArticleUseCase(get()) }
     factory { LoginViewModel(get()) }
     factory { MainViewModel() }
     factory { RegisterViewModel(get()) }
@@ -42,7 +44,7 @@ val appModule = module {
     factory { SettingViewModel() }
     factory { WechatAccountViewModel(get()) }
     factory { (id: Int) -> ArticleInWechatAccountViewModel(id, get()) }
-    factory { UserFavoriteViewModel(get()) }
+    factory { UserFavoriteViewModel(get(), get()) }
     factory { UserSharedViewModel(get()) }
     factory { UserAddSharedViewModel(get()) }
 }

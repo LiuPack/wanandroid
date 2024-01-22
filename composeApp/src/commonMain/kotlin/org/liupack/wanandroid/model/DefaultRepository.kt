@@ -5,6 +5,7 @@ import app.cash.paging.Pager
 import app.cash.paging.PagingData
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.http.parameters
 import kotlinx.coroutines.Dispatchers
@@ -212,6 +213,15 @@ class DefaultRepository : Repository {
         return flow {
             val result = connect().post(NetworkConfig.unFavoriteArticle.replaceRealIdApi(id))
                 .dataResultBody<String>().catchData
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun cancelUserFavoriteArticle(id: Int, originId: Int): Flow<String?> {
+        return flow {
+            val result = connect().post(NetworkConfig.unUserFavoriteArticle.replaceRealIdApi(id)) {
+                parameter("originId", originId)
+            }.dataResultBody<String>().catchData
             emit(result)
         }.flowOn(Dispatchers.IO)
     }

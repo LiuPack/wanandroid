@@ -176,4 +176,13 @@ interface Repository {
      * @return
      */
     fun cancelFavoriteArticle(id: Int): Flow<String?>
+
+    /**
+     * 我的收藏页面的取消收藏
+     *
+     * @param id
+     * @param originId
+     * @return
+     */
+    fun cancelUserFavoriteArticle(id: Int, originId: Int): Flow<String?>
 }
