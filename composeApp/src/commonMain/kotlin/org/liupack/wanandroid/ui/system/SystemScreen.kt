@@ -37,7 +37,6 @@ import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.FullUiStateLayout
-import org.liupack.wanandroid.composables.rememberLogger
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.SystemBaseData
 import org.liupack.wanandroid.platform.exitApp
@@ -46,9 +45,7 @@ import org.liupack.wanandroid.router.Router
 fun RouteBuilder.systemScreen(navigator: Navigator) {
     scene(route = Router.System.path, navTransition = NavTransition()) {
         BackHandler { exitApp() }
-        val logger = rememberLogger()
         val viewModel = koinViewModel(SystemViewModel::class)
-        logger.i("初始化：systemScreen:${viewModel.hashCode()}")
         LaunchedEffect(viewModel.hashCode()) {
             viewModel.dispatch(SystemAction.Init)
         }

@@ -1,5 +1,7 @@
 package org.liupack.wanandroid.ui.project
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -47,13 +49,13 @@ fun RouteBuilder.projectScreen(navigator: Navigator) {
 @Composable
 private fun ProjectScreen(navigator: Navigator) {
     val viewModel = koinViewModel(ProjectViewModel::class)
-    LaunchedEffect(viewModel.hashCode()) {
+    LaunchedEffect(viewModel) {
         viewModel.projectSort()
     }
     val projectSortList by viewModel.projectSort.collectAsState()
     if (projectSortList.isNotEmpty()) {
         val childNavigator = rememberNavigator()
-        val routers by remember {
+        val routers by remember(viewModel) {
             derivedStateOf {
                 projectSortList.map { it.id.toString() }.toList()
             }
@@ -112,6 +114,10 @@ private fun ProjectScreen(navigator: Navigator) {
                     initialRoute = routers.first(),
                     modifier = Modifier.fillMaxSize()
                         .padding(top = paddingValues.calculateTopPadding()),
+                    navTransition = NavTransition(
+                        createTransition = fadeIn(),
+                        destroyTransition = fadeOut()
+                    ),
                     persistNavState = true,
                     builder = {
                         routers.forEach {

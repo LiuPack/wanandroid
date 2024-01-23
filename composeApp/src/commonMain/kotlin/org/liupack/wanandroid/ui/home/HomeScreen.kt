@@ -19,6 +19,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -33,7 +34,6 @@ import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.Constants
-import org.liupack.wanandroid.common.Logger
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.ArticleItem
@@ -50,9 +50,10 @@ fun RouteBuilder.homeScreen(navigator: Navigator) {
         val articleState = viewModel.articles.collectAsLazyPagingItems()
         val lazyListState = rememberLazyListState()
         val favoriteState by viewModel.favoriteState.collectAsState(null)
-        if (favoriteState != null) {
-            Logger.i("收藏状态：$favoriteState")
-            articleState.refresh()
+        LaunchedEffect(favoriteState) {
+            if (favoriteState == true) {
+                articleState.refresh()
+            }
         }
         HomeScreen(
             navigator = navigator,

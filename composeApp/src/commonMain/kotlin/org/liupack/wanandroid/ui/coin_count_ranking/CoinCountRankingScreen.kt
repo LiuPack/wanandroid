@@ -3,7 +3,6 @@ package org.liupack.wanandroid.ui.coin_count_ranking
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -79,33 +78,30 @@ private fun CoinCountRankingScreen(navigator: Navigator) {
             )
         )
     }, content = { paddingValues ->
-        Box(
-            modifier = Modifier.padding(paddingValues).fillMaxSize(),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            PagingFullLoadLayout(
-                modifier = Modifier.pullRefresh(refreshState),
-                pagingState = coinCountRankingState,
-                content = {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), content = {
-                        items(coinCountRankingState.itemCount,
-                            key = coinCountRankingState.itemKey { it.userId }) { index ->
-                            val data = coinCountRankingState[index]
-                            if (data != null) {
-                                CoinCountRankingItem(
-                                    data = data,
-                                    max = coinCountRankingState[0]?.coinCount ?: 0
-                                )
-                            }
+        PagingFullLoadLayout(
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+                .pullRefresh(refreshState),
+            pagingState = coinCountRankingState,
+            content = {
+                LazyColumn(modifier = Modifier.fillMaxSize(), content = {
+                    items(coinCountRankingState.itemCount,
+                        key = coinCountRankingState.itemKey { it.userId }) { index ->
+                        val data = coinCountRankingState[index]
+                        if (data != null) {
+                            CoinCountRankingItem(
+                                data = data,
+                                max = coinCountRankingState[0]?.coinCount ?: 0
+                            )
                         }
-                        pagingFooter(pagingState = coinCountRankingState)
-                    })
-                },
-            )
-            PullRefreshIndicator(
-                refreshing = refreshing, state = refreshState
-            )
-        }
+                    }
+                    pagingFooter(pagingState = coinCountRankingState)
+                })
+                PullRefreshIndicator(
+                    refreshing = refreshing, state = refreshState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            },
+        )
     })
 }
 

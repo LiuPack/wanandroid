@@ -3,15 +3,11 @@ package org.liupack.wanandroid.ui.user_coincount
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
@@ -33,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +37,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import moe.tlaster.precompose.koin.koinViewModel
@@ -69,7 +65,6 @@ private fun UserCoinCountScreen(navigator: Navigator) {
     LaunchedEffect(viewModel.hashCode()) {
         viewModel.dispatch(UserCoinCountAction.Refresh)
     }
-    val refresh by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val userCoinCountState by viewModel.userCoinCountState.collectAsState()
     val userCoinCountListState = viewModel.userCoinCountList.collectAsLazyPagingItems()
@@ -79,51 +74,51 @@ private fun UserCoinCountScreen(navigator: Navigator) {
             navigator.navigate(Router.CoinCountRanking.path)
         }
     }
-    val refreshState = rememberPullRefreshState(refreshing = refresh, onRefresh = {
-        viewModel.dispatch(UserCoinCountAction.Refresh)
-        userCoinCountListState.refresh()
-    })
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter, content = {
-        Scaffold(modifier = Modifier.fillMaxSize().pullRefresh(state = refreshState), topBar = {
-            LargeTopAppBar(
-                title = { TitleCoinCount(userCoinCountState) },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.dispatch(UserCoinCountAction.ToRanking)
-                    }, content = {
-                        Icon(
-                            imageVector = Icons.Outlined.ViewKanban,
-                            contentDescription = null,
-                            modifier = Modifier.rotate(180f)
-                        )
-                    })
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                    actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                    navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                ),
-                navigationIcon = { IconBackButton(onClick = { navigator.goBack() }) },
-                scrollBehavior = scrollBehavior,
-            )
-        }, content = {
-            PagingFullLoadLayout(
-                modifier = Modifier.fillMaxSize().padding(it),
-                pagingState = userCoinCountListState,
-                content = {
-                    UserCoinCountContent(
-                        modifier = Modifier.fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
-                        userCoinCountList = userCoinCountListState,
+    val refreshState = rememberPullRefreshState(
+        refreshing = userCoinCountListState.loadState.refresh is LoadStateLoading,
+        onRefresh = {
+            viewModel.dispatch(UserCoinCountAction.Refresh)
+            userCoinCountListState.refresh()
+        })
+    Scaffold(modifier = Modifier.fillMaxSize().pullRefresh(state = refreshState), topBar = {
+        LargeTopAppBar(
+            title = { TitleCoinCount(userCoinCountState) },
+            actions = {
+                IconButton(onClick = {
+                    viewModel.dispatch(UserCoinCountAction.ToRanking)
+                }, content = {
+                    Icon(
+                        imageVector = Icons.Outlined.ViewKanban,
+                        contentDescription = null,
+                        modifier = Modifier.rotate(180f)
                     )
                 })
-        })
-        PullRefreshIndicator(
-            refreshing = refresh,
-            state = refreshState,
-            modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+            ),
+            navigationIcon = { IconBackButton(onClick = { navigator.goBack() }) },
+            scrollBehavior = scrollBehavior,
         )
+    }, content = {
+        PagingFullLoadLayout(
+            modifier = Modifier.fillMaxSize().padding(it),
+            pagingState = userCoinCountListState,
+            content = {
+                UserCoinCountContent(
+                    modifier = Modifier.fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    userCoinCountList = userCoinCountListState,
+                )
+                PullRefreshIndicator(
+                    refreshing = userCoinCountListState.loadState.refresh is LoadStateLoading,
+                    state = refreshState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            })
     })
 }
 

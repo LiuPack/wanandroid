@@ -109,6 +109,7 @@ fun <T> FullUiStateLayout(
     modifier: Modifier = Modifier,
     uiState: UiState<T>? = null,
     onRetry: () -> Unit = {},
+    loginContent: (@Composable (String) -> Unit)? = null,
     content: @Composable BoxScope.(T) -> Unit
 ) {
     if (uiState != null) {
@@ -120,12 +121,21 @@ fun <T> FullUiStateLayout(
             }
 
             is UiState.Exception -> {
-                val message =
-                    if (uiState.isLoginExpired) "未登录" else uiState.throwable.message
-                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Button(onClick = onRetry, content = {
-                        Text(message ?: "重新加载")
-                    })
+                if (uiState.isLoginExpired) {
+                    loginContent?.invoke("去登录") ?: Box(
+                        modifier = modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(onClick = onRetry, content = {
+                            Text("去登录")
+                        })
+                    }
+                } else {
+                    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Button(onClick = onRetry, content = {
+                            Text(uiState.throwable.message ?: "重新加载")
+                        })
+                    }
                 }
             }
 

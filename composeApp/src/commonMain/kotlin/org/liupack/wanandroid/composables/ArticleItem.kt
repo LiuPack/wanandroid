@@ -34,7 +34,8 @@ import org.liupack.wanandroid.model.entity.HomeArticleItemData
 fun ArticleItem(
     modifier: Modifier = Modifier,
     data: HomeArticleItemData,
-    onFavoriteClick: HomeArticleItemData.(Boolean) -> Unit = {},
+    favoriteVisibility: Boolean = true,
+    onFavoriteClick: HomeArticleItemData .(Boolean) -> Unit = {},
     onLongClick: (HomeArticleItemData) -> Unit = {},
     onClick: (HomeArticleItemData) -> Unit = {}
 ) {
@@ -68,20 +69,22 @@ fun ArticleItem(
                     modifier = Modifier.align(Alignment.Start),
                 )
             }
-            IconToggleButton(
-                checked = favoriteState,
-                onCheckedChange = {
-                    onFavoriteClick.invoke(data, it)
-                },
-                content = {
-                    Icon(
-                        imageVector = if (favoriteState) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                },
-            )
+            if (favoriteVisibility) {
+                IconToggleButton(
+                    checked = favoriteState,
+                    onCheckedChange = {
+                        onFavoriteClick.invoke(data, it)
+                    },
+                    content = {
+                        Icon(
+                            imageVector = if (favoriteState) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    },
+                )
+            }
         }
 
     }

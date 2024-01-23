@@ -1,20 +1,16 @@
 package org.liupack.wanandroid.ui.project.child
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
@@ -54,51 +50,59 @@ fun ProjectListScreen(navigator: Navigator, id: Int) {
         parameters = { parametersOf(id) })
     val projectList = viewModel.projectList.collectAsLazyPagingItems()
     val lazyListState = projectList.rememberLazyListState()
+    val favoriteState by viewModel.favoriteState.collectAsState(null)
+    LaunchedEffect(favoriteState) {
+        if (favoriteState == true) {
+            projectList.refresh()
+        }
+    }
     PagingFullLoadLayout(modifier = Modifier.fillMaxSize(), pagingState = projectList, content = {
         ProjectList(
             modifier = Modifier.fillMaxSize(),
             navigator = navigator,
             projectList = projectList,
-            lazyListState = lazyListState
+            lazyListState = lazyListState,
+            addFavorite = {
+                viewModel.dispatch(ProjectListAction.Favorite(it.id))
+            }, cancelFavorite = {
+                viewModel.dispatch(ProjectListAction.CancelFavorite(it.id))
+            }
         )
     })
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun BoxScope.ProjectList(
+private fun ProjectList(
     modifier: Modifier,
     navigator: Navigator,
     projectList: LazyPagingItems<HomeArticleItemData> = collectAsLazyEmptyPagingItems(),
     lazyListState: LazyListState,
+    addFavorite: (HomeArticleItemData) -> Unit = {},
+    cancelFavorite: (HomeArticleItemData) -> Unit = {},
 ) {
-    val refreshState = rememberPullRefreshState(
-        refreshing = projectList.loadState.refresh is LoadStateLoading,
-        onRefresh = {
-            projectList.refresh()
-        })
     LazyColumn(
-        modifier = modifier.pullRefresh(refreshState),
+        modifier = modifier,
         state = lazyListState,
         contentPadding = PaddingValues(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(projectList.itemCount, key = projectList.itemKey { it.id }) {
-            val data = projectList[it]
+        items(projectList.itemCount, key = projectList.itemKey { it.id }) { index ->
+            val data = projectList[index]
             if (data != null) {
                 ArticleItem(data = data, onClick = {
                     val path = Router.WebView.parametersOf(RouterKey.url to it.link)
                     navigator.navigate(route = path, options = NavOptions(launchSingleTop = true))
+                }, onFavoriteClick = {
+                    if (it) {
+                        addFavorite.invoke(data)
+                    } else {
+                        cancelFavorite.invoke(data)
+                    }
                 })
             }
         }
         pagingFooter(projectList)
     }
-    PullRefreshIndicator(
-        state = refreshState,
-        refreshing = projectList.loadState.refresh is LoadStateLoading,
-        modifier = Modifier.align(Alignment.TopCenter)
-    )
 }
 
 

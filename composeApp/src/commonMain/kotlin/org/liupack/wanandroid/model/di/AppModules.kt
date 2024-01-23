@@ -37,13 +37,13 @@ val appModule = module {
     factory { WechatAccountViewModel(get()) }
     factory { ProjectViewModel(get()) }
     factory { UserViewModel(get()) }
-    factory { (id: Int) -> ProjectListViewModel(id, get()) }
+    factory { (id: Int) -> ProjectListViewModel(id, get(), get(), get()) }
     factory { UserCoinCountViewModel(get()) }
     factory { CoinCountRankingViewModel(get()) }
-    factory { (cid: Int) -> ArticleInSystemViewModel(cid, get()) }
+    factory { (cid: Int) -> ArticleInSystemViewModel(cid, get(), get(), get()) }
     factory { SettingViewModel() }
     factory { WechatAccountViewModel(get()) }
-    factory { (id: Int) -> ArticleInWechatAccountViewModel(id, get()) }
+    factory { (id: Int) -> ArticleInWechatAccountViewModel(id, get(), get(), get()) }
     factory { UserFavoriteViewModel(get(), get()) }
     factory { UserSharedViewModel(get()) }
     factory { UserAddSharedViewModel(get()) }

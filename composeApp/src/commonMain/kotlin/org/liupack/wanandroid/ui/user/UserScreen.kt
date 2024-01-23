@@ -8,20 +8,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -168,7 +165,7 @@ private fun UserInfoContent(
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 Box(
-                    modifier = Modifier.fillMaxWidth().aspectRatio(2f).background(
+                    modifier = Modifier.background(
                         brush = Brush.linearGradient(
                             colors = listOf(
                                 MaterialTheme.colorScheme.primary,
@@ -176,11 +173,11 @@ private fun UserInfoContent(
                                 MaterialTheme.colorScheme.tertiary,
                             )
                         )
-                    ).padding(WindowInsets.safeDrawing.asPaddingValues()),
+                    ),
                     contentAlignment = Alignment.Center
                 ) {
                     FullUiStateLayout(
-                        modifier = Modifier.matchParentSize(),
+                        modifier = Modifier.fillMaxWidth(),
                         uiState = userInfoState,
                         onRetry = {
                             if (userInfoState?.isLoginExpired == true) {
@@ -189,15 +186,25 @@ private fun UserInfoContent(
                                 refresh.invoke()
                             }
                         },
+                        loginContent = {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().aspectRatio(1.8f)
+                                    .align(Alignment.Center),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Button(onClick = needLogin, content = {
+                                    Text(it)
+                                })
+                            }
+                        },
                         content = { data ->
                             if (data != null) {
                                 Column(
-                                    modifier = Modifier.fillMaxWidth()
-                                        .wrapContentSize().align(Alignment.Center),
+                                    modifier = Modifier.fillMaxWidth().aspectRatio(1.8f)
+                                        .align(Alignment.Center),
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    verticalArrangement = Arrangement.Center
                                 ) {
-                                    //https://www.iconfont.cn/illustrations/detail?spm=a313x.illustrations_index.i1.d9df05512.6ae13a81mzJ56W&cid=47401
                                     Image(
                                         painter = painterResource("android_studio.png"),
                                         contentDescription = null,

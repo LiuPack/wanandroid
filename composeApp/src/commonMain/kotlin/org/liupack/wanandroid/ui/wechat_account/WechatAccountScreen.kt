@@ -50,7 +50,7 @@ fun RouteBuilder.wechatAccountScreen(navigator: Navigator) {
 @Composable
 private fun WechatAccountScreen(navigator: Navigator) {
     val viewModel = koinViewModel(WechatAccountViewModel::class)
-    LaunchedEffect(viewModel.hashCode()) {
+    LaunchedEffect(viewModel) {
         viewModel.getWechatAccountList()
     }
     val wechatAccountState by viewModel.wechatAccountList.collectAsState()
@@ -62,7 +62,7 @@ private fun WechatAccountScreen(navigator: Navigator) {
         content = { dataList ->
             if (dataList.isNotEmpty()) {
                 val childNavigator = rememberNavigator()
-                val routers by remember {
+                val routers by remember(viewModel.hashCode()) {
                     derivedStateOf { dataList.map { it.id.toString() }.toList() }
                 }
                 Scaffold(topBar = {

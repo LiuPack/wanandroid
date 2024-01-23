@@ -107,7 +107,7 @@ fun UserSharedScreen(navigator: Navigator) {
                                 onDismiss = {
                                     viewModel.dispatch(UserSharedAction.ShowDeleted(false))
                                 })
-                            ArticleItem(data = item, onLongClick = {
+                            ArticleItem(data = item, favoriteVisibility = false, onLongClick = {
                                 viewModel.dispatch(UserSharedAction.ShowDeleted(true))
                             })
                         }

@@ -13,6 +13,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.cash.paging.compose.collectAsLazyPagingItems
@@ -41,8 +43,8 @@ fun RouteBuilder.articleInSystemScreen(navigator: Navigator) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?) {
-    val viewModel = koinViewModel(ArticleInSystemViewModel::class) { parametersOf(id) }
-    val articleState = viewModel.articleState.collectAsLazyPagingItems()
+    val viewModel =
+        koinViewModel(ArticleInSystemViewModel::class, key = id.toString()) { parametersOf(id) }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(
             title = { Text(title ?: "文章") },
@@ -55,6 +57,11 @@ private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?
             )
         )
     }, content = { paddingValues ->
+        val articleState = viewModel.articleState.collectAsLazyPagingItems()
+        val favoriteState by viewModel.favoriteState.collectAsState(null)
+        if (favoriteState != null) {
+            articleState.refresh()
+        }
         PagingFullLoadLayout(modifier = Modifier.fillMaxSize()
             .padding(top = paddingValues.calculateTopPadding()),
             pagingState = articleState,
@@ -68,11 +75,29 @@ private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?
                             itemContent = { index ->
                                 val data = articleState[index]
                                 if (data != null) {
-                                    ArticleItem(data = data, onClick = {
-                                        val path =
-                                            Router.WebView.parametersOf(RouterKey.url to it.link)
-                                        navigator.navigate(path)
-                                    })
+                                    ArticleItem(
+                                        data = data,
+                                        onClick = {
+                                            val path =
+                                                Router.WebView.parametersOf(RouterKey.url to it.link)
+                                            navigator.navigate(path)
+                                        },
+                                        onFavoriteClick = {
+                                            if (it) {
+                                                viewModel.dispatch(
+                                                    ArticleInSystemAction.Favorite(
+                                                        data.id
+                                                    )
+                                                )
+                                            } else {
+                                                viewModel.dispatch(
+                                                    ArticleInSystemAction.CancelFavorite(
+                                                        data.id
+                                                    )
+                                                )
+                                            }
+                                        },
+                                    )
                                 }
                             })
                         pagingFooter(articleState)
