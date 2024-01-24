@@ -250,7 +250,12 @@ private fun UserInfoContent(
             }
             items(userNavigator) { navigator ->
                 ListItem(modifier = Modifier.fillMaxWidth()
-                    .clickable(enabled = userInfoState?.successDataOrNull != null) {
+                    .clickable(
+                        enabled = userInfoState?.successDataOrNull != null || navigator in listOf(
+                            UserNavigator.AboutUser,
+                            UserNavigator.SystemSetting
+                        )
+                    ) {
                         itemClick.invoke(navigator)
                     },
                     leadingContent = {

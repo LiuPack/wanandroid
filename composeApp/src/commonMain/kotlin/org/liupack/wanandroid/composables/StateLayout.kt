@@ -19,14 +19,16 @@ import app.cash.paging.compose.LazyPagingItems
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
+import org.liupack.wanandroid.network.exception.LoginExpiredException
 
 @Composable
 fun <T : Any> PagingFullLoadLayout(
     modifier: Modifier = Modifier,
     pagingState: LazyPagingItems<T> = collectAsLazyEmptyPagingItems(),
+    loginAction: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit
 ) {
-    when (pagingState.loadState.refresh) {
+    when (val state = pagingState.loadState.refresh) {
         is LoadStateLoading -> {
             if (pagingState.itemCount == 0) {
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -40,6 +42,9 @@ fun <T : Any> PagingFullLoadLayout(
         }
 
         is LoadStateError -> {
+            if (state.error is LoginExpiredException) {
+                loginAction.invoke()
+            }
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Button(onClick = {
                     pagingState.refresh()

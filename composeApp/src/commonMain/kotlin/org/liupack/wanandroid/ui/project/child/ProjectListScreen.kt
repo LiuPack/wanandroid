@@ -9,11 +9,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
+import com.lt.compose_views.refresh_layout.PullToRefresh
+import com.lt.compose_views.refresh_layout.RefreshContentStateEnum
+import com.lt.compose_views.refresh_layout.rememberRefreshLayoutState
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.NavOptions
@@ -27,6 +34,8 @@ import org.liupack.wanandroid.composables.ArticleItem
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.composables.rememberLazyListState
+import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
+import org.liupack.wanandroid.model.UiStateSuccess
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
@@ -51,24 +60,54 @@ fun ProjectListScreen(navigator: Navigator, id: Int) {
     val projectList = viewModel.projectList.collectAsLazyPagingItems()
     val lazyListState = projectList.rememberLazyListState()
     val favoriteState by viewModel.favoriteState.collectAsState(null)
-    LaunchedEffect(favoriteState) {
-        if (favoriteState == true) {
-            projectList.refresh()
+    var isFavoriteAction by remember { mutableStateOf(false) }
+    favoriteState?.let {
+        LaunchedEffect(it) {
+            if (it.isLoginExpired) {
+                val result = navigator.navigateForResult(
+                    Router.Login.path,
+                    NavOptions(launchSingleTop = true)
+                )
+                if (result == true) {
+                    projectList.refresh()
+                }
+            }
+            if (favoriteState is UiStateSuccess) {
+                isFavoriteAction = true
+                projectList.refresh()
+            }
         }
     }
-    PagingFullLoadLayout(modifier = Modifier.fillMaxSize(), pagingState = projectList, content = {
-        ProjectList(
-            modifier = Modifier.fillMaxSize(),
-            navigator = navigator,
-            projectList = projectList,
-            lazyListState = lazyListState,
-            addFavorite = {
-                viewModel.dispatch(ProjectListAction.Favorite(it.id))
-            }, cancelFavorite = {
-                viewModel.dispatch(ProjectListAction.CancelFavorite(it.id))
-            }
-        )
-    })
+    val refreshLayoutState = rememberRefreshLayoutState {
+        isFavoriteAction = false
+        projectList.refresh()
+    }
+    LaunchedEffect(projectList.loadState.refresh) {
+        val canRefresh = projectList.loadState.refresh is LoadStateLoading && !isFavoriteAction
+        refreshLayoutState.setRefreshState(if (canRefresh) RefreshContentStateEnum.Refreshing else RefreshContentStateEnum.Stop)
+    }
+    PullToRefresh(
+        refreshLayoutState = refreshLayoutState,
+        modifier = Modifier.fillMaxSize(),
+        content = {
+            PagingFullLoadLayout(
+                modifier = Modifier.fillMaxSize(),
+                pagingState = projectList,
+                content = {
+                    ProjectList(
+                        modifier = Modifier.fillMaxSize(),
+                        navigator = navigator,
+                        projectList = projectList,
+                        lazyListState = lazyListState,
+                        addFavorite = {
+                            viewModel.dispatch(ProjectListAction.Favorite(it.id))
+                        }, cancelFavorite = {
+                            viewModel.dispatch(ProjectListAction.CancelFavorite(it.id))
+                        }
+                    )
+                })
+        },
+    )
 }
 
 @Composable
@@ -91,7 +130,10 @@ private fun ProjectList(
             if (data != null) {
                 ArticleItem(data = data, onClick = {
                     val path = Router.WebView.parametersOf(RouterKey.url to it.link)
-                    navigator.navigate(route = path, options = NavOptions(launchSingleTop = true))
+                    navigator.navigate(
+                        route = path,
+                        options = NavOptions(launchSingleTop = true)
+                    )
                 }, onFavoriteClick = {
                     if (it) {
                         addFavorite.invoke(data)

@@ -1,8 +1,8 @@
 package org.liupack.wanandroid.ui.user_favorite
 
 import androidx.paging.cachedIn
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.model.Repository
+import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.usecase.CancelUserFavoriteArticleUseCase
 
 class UserFavoriteViewModel(
@@ -20,8 +21,8 @@ class UserFavoriteViewModel(
 
     val favoriteArticles = repository.userFavoriteArticles().cachedIn(viewModelScope)
 
-    private val mFavoriteState = MutableStateFlow<Boolean?>(null)
-    val favoriteState = mFavoriteState.asStateFlow()
+    private val mFavoriteState = MutableSharedFlow<UiState<Boolean>>()
+    val favoriteState = mFavoriteState.asSharedFlow()
 
     fun dispatch(action: UserFavoriteAction) {
         viewModelScope.launch {
@@ -36,11 +37,11 @@ class UserFavoriteViewModel(
     private fun cancelFavoriteArticle(id: Int, originId: Int) {
         viewModelScope.launch {
             cancelUserFavoriteArticleUseCase(id = id, originId = originId).onStart {
-                mFavoriteState.emit(null)
+                mFavoriteState.emit(UiState.Loading)
             }.onEach {
-                mFavoriteState.emit(true)
+                mFavoriteState.emit(UiState.Success(true))
             }.catch {
-                mFavoriteState.emit(false)
+                mFavoriteState.emit(UiState.Exception(it))
             }.launchIn(viewModelScope)
         }
     }

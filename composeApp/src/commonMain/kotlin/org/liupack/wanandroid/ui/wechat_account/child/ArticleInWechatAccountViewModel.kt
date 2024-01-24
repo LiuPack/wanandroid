@@ -1,15 +1,17 @@
 package org.liupack.wanandroid.ui.wechat_account.child
 
 import androidx.paging.cachedIn
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.model.Repository
+import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.usecase.CancelFavoriteArticleUseCase
 import org.liupack.wanandroid.model.usecase.FavoriteArticleUseCase
 
@@ -22,11 +24,8 @@ class ArticleInWechatAccountViewModel(
 
     val article = repository.articleInWechatAccount(id).cachedIn(viewModelScope)
 
-    private var mFavoriteState = MutableStateFlow(false)
-    val favoriteState = mFavoriteState.asStateFlow()
-
-    private var mCancelFavoriteState = MutableStateFlow(false)
-    val cancelFavoriteState = mCancelFavoriteState.asStateFlow()
+    private val mFavoriteState = MutableSharedFlow<UiState<Boolean>>()
+    val favoriteState = mFavoriteState.asSharedFlow()
 
     fun dispatch(action: ArticleInWechatAccountAction) {
         when (action) {
@@ -47,24 +46,24 @@ class ArticleInWechatAccountViewModel(
     private fun favoriteArticle(id: Int) {
         viewModelScope.launch {
             favoriteArticleUseCase(id).onStart {
-                mFavoriteState.emit(false)
+                mFavoriteState.emit(UiState.Loading)
+            }.onEach {
+                mFavoriteState.emit(UiState.Success(true))
             }.catch {
-                mFavoriteState.emit(false)
-            }.collectLatest {
-                mFavoriteState.emit(true)
-            }
+                mFavoriteState.emit(UiState.Exception(it))
+            }.launchIn(viewModelScope)
         }
     }
 
     private fun cancelFavoriteArticle(id: Int) {
         viewModelScope.launch {
             cancelFavoriteArticleUseCase(id).onStart {
-                mCancelFavoriteState.emit(false)
+                mFavoriteState.emit(UiState.Loading)
+            }.onEach {
+                mFavoriteState.emit(UiState.Success(true))
             }.catch {
-                mCancelFavoriteState.emit(false)
-            }.collectLatest {
-                mCancelFavoriteState.emit(true)
-            }
+                mFavoriteState.emit(UiState.Exception(it))
+            }.launchIn(viewModelScope)
         }
     }
 }

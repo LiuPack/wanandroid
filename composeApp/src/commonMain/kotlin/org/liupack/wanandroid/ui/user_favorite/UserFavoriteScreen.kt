@@ -23,10 +23,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,8 +37,12 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
+import com.lt.compose_views.refresh_layout.PullToRefresh
+import com.lt.compose_views.refresh_layout.RefreshContentStateEnum
+import com.lt.compose_views.refresh_layout.rememberRefreshLayoutState
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
@@ -45,6 +52,8 @@ import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
+import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
+import org.liupack.wanandroid.model.UiStateSuccess
 import org.liupack.wanandroid.model.entity.UserFavoriteArticleData
 import org.liupack.wanandroid.router.Router
 
@@ -65,48 +74,76 @@ fun UserFavoriteScreen(navigator: Navigator) {
         content = { paddingValues ->
             val favoriteArticlesState = viewModel.favoriteArticles.collectAsLazyPagingItems()
             val favoriteState by viewModel.favoriteState.collectAsState(null)
-            if (favoriteState != null) {
+            var isFavoriteAction by remember { mutableStateOf(false) }
+            val refreshLayoutState = rememberRefreshLayoutState {
+                isFavoriteAction = false
                 favoriteArticlesState.refresh()
             }
-            PagingFullLoadLayout(
-                modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-                pagingState = favoriteArticlesState,
-                content = {
-
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(
-                            favoriteArticlesState.itemCount,
-                            key = favoriteArticlesState.itemKey { it.id }) { index ->
-                            val data = favoriteArticlesState[index]
-                            if (data != null) {
-                                FavoriteArticleItem(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    data = data,
-                                    onClick = {
-                                        val path =
-                                            Router.WebView.parametersOf(RouterKey.url to it.link)
-                                        navigator.navigate(
-                                            route = path,
-                                            options = NavOptions(launchSingleTop = true)
-                                        )
-                                    }, onFavoriteClick = {
-                                        viewModel.dispatch(
-                                            UserFavoriteAction.CancelFavorite(
-                                                id = id,
-                                                originId = originId
-                                            )
-                                        )
-                                    })
-                            }
+            favoriteState?.let {
+                LaunchedEffect(it) {
+                    if (it.isLoginExpired) {
+                        val result = navigator.navigateForResult(
+                            Router.Login.path,
+                            NavOptions(launchSingleTop = true)
+                        )
+                        if (result == true) {
+                            favoriteArticlesState.refresh()
                         }
-                        pagingFooter(pagingState = favoriteArticlesState)
                     }
-                },
-            )
+                    if (favoriteState is UiStateSuccess) {
+                        isFavoriteAction = true
+                        favoriteArticlesState.refresh()
+                    }
+                }
+            }
+            LaunchedEffect(favoriteArticlesState.loadState.refresh) {
+                val refresh =
+                    if (favoriteArticlesState.loadState.refresh is LoadStateLoading && !isFavoriteAction) RefreshContentStateEnum.Refreshing else RefreshContentStateEnum.Stop
+                refreshLayoutState.setRefreshState(refresh)
+            }
+            PullToRefresh(
+                refreshLayoutState = refreshLayoutState,
+                modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+                content = {
+                    PagingFullLoadLayout(
+                        modifier = Modifier.fillMaxSize(),
+                        pagingState = favoriteArticlesState,
+                        content = {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(
+                                    favoriteArticlesState.itemCount,
+                                    key = favoriteArticlesState.itemKey { it.id }) { index ->
+                                    val data = favoriteArticlesState[index]
+                                    if (data != null) {
+                                        FavoriteArticleItem(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            data = data,
+                                            onClick = {
+                                                val path =
+                                                    Router.WebView.parametersOf(RouterKey.url to it.link)
+                                                navigator.navigate(
+                                                    route = path,
+                                                    options = NavOptions(launchSingleTop = true)
+                                                )
+                                            }, onFavoriteClick = {
+                                                viewModel.dispatch(
+                                                    UserFavoriteAction.CancelFavorite(
+                                                        id = id,
+                                                        originId = originId
+                                                    )
+                                                )
+                                            })
+                                    }
+                                }
+                                pagingFooter(pagingState = favoriteArticlesState)
+                            }
+                        },
+                    )
+                })
         },
     )
 }

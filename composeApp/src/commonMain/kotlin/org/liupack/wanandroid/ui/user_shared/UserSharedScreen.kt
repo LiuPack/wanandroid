@@ -16,14 +16,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
+import com.lt.compose_views.refresh_layout.PullToRefresh
+import com.lt.compose_views.refresh_layout.RefreshContentStateEnum
+import com.lt.compose_views.refresh_layout.rememberRefreshLayoutState
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavOptions
@@ -51,6 +56,12 @@ fun RouteBuilder.userSharedScreen(navigator: Navigator) {
 fun UserSharedScreen(navigator: Navigator) {
     val viewModel = koinViewModel(UserSharedViewModel::class)
     val shareArticlesState = viewModel.shareArticles.collectAsLazyPagingItems()
+    val refreshLayoutState = rememberRefreshLayoutState { shareArticlesState.refresh() }
+    LaunchedEffect(shareArticlesState.loadState.refresh) {
+        val refreshState =
+            if (shareArticlesState.loadState.refresh is LoadStateLoading) RefreshContentStateEnum.Refreshing else RefreshContentStateEnum.Stop
+        refreshLayoutState.setRefreshState(refreshState)
+    }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         UserSharedTopAppBar(
             navigator = navigator,
@@ -61,60 +72,65 @@ fun UserSharedScreen(navigator: Navigator) {
             }
         )
     }, content = { paddingValues ->
-        PagingFullLoadLayout(
+        PullToRefresh(
+            refreshLayoutState = refreshLayoutState,
             modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()),
-            pagingState = shareArticlesState,
-            content = {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().align(Alignment.Center),
-                    contentPadding = PaddingValues(horizontal = 12.dp)
-                ) {
-                    items(
-                        shareArticlesState.itemCount,
-                        key = shareArticlesState.itemKey { it.id }) { index ->
-                        val item = shareArticlesState[index]
-                        if (item != null) {
-                            val deletedVisibility by viewModel.deletedVisibility.collectAsState(
-                                false
-                            )
-                            val deletedState by viewModel.deletedState.collectAsState(null)
-                            when (val state = deletedState) {
-                                is UiStateLoading -> {
-                                    LoadingDialog(true)
-                                }
+        ) {
+            PagingFullLoadLayout(
+                modifier = Modifier.fillMaxSize(),
+                pagingState = shareArticlesState,
+                content = {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize().align(Alignment.Center),
+                        contentPadding = PaddingValues(horizontal = 12.dp)
+                    ) {
+                        items(
+                            shareArticlesState.itemCount,
+                            key = shareArticlesState.itemKey { it.id }) { index ->
+                            val item = shareArticlesState[index]
+                            if (item != null) {
+                                val deletedVisibility by viewModel.deletedVisibility.collectAsState(
+                                    false
+                                )
+                                val deletedState by viewModel.deletedState.collectAsState(null)
+                                when (val state = deletedState) {
+                                    is UiStateLoading -> {
+                                        LoadingDialog(true)
+                                    }
 
-                                is UiStateException -> {
-                                    MessageDialog(true, state.throwable.stackTraceToString())
-                                }
+                                    is UiStateException -> {
+                                        MessageDialog(true, state.throwable.stackTraceToString())
+                                    }
 
-                                is UiStateFailed -> {
-                                    MessageDialog(true, state.message)
-                                }
+                                    is UiStateFailed -> {
+                                        MessageDialog(true, state.message)
+                                    }
 
-                                is UiStateSuccess -> {
-                                    shareArticlesState.refresh()
-                                }
+                                    is UiStateSuccess -> {
+                                        shareArticlesState.refresh()
+                                    }
 
-                                else -> {}
-                            }
-                            DeletedDialog(
-                                isVisibility = deletedVisibility,
-                                message = "是否删除当前分享的文章",
-                                onDeleted = {
-                                    viewModel.dispatch(UserSharedAction.ShowDeleted(false))
-                                    viewModel.dispatch(UserSharedAction.Deleted(item.id))
-                                },
-                                onDismiss = {
-                                    viewModel.dispatch(UserSharedAction.ShowDeleted(false))
+                                    else -> {}
+                                }
+                                DeletedDialog(
+                                    isVisibility = deletedVisibility,
+                                    message = "是否删除当前分享的文章",
+                                    onDeleted = {
+                                        viewModel.dispatch(UserSharedAction.ShowDeleted(false))
+                                        viewModel.dispatch(UserSharedAction.Deleted(item.id))
+                                    },
+                                    onDismiss = {
+                                        viewModel.dispatch(UserSharedAction.ShowDeleted(false))
+                                    })
+                                ArticleItem(data = item, favoriteVisibility = false, onLongClick = {
+                                    viewModel.dispatch(UserSharedAction.ShowDeleted(true))
                                 })
-                            ArticleItem(data = item, favoriteVisibility = false, onLongClick = {
-                                viewModel.dispatch(UserSharedAction.ShowDeleted(true))
-                            })
+                            }
                         }
                     }
-                }
-            },
-        )
+                },
+            )
+        }
     })
 }
 

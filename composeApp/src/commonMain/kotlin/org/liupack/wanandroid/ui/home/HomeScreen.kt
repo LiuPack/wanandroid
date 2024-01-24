@@ -22,11 +22,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
+import com.lt.compose_views.refresh_layout.PullToRefresh
+import com.lt.compose_views.refresh_layout.RefreshContentStateEnum
+import com.lt.compose_views.refresh_layout.RefreshLayoutState
+import com.lt.compose_views.refresh_layout.rememberRefreshLayoutState
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.NavOptions
@@ -39,6 +47,8 @@ import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.ArticleItem
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
+import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
+import org.liupack.wanandroid.model.UiStateSuccess
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
@@ -50,13 +60,34 @@ fun RouteBuilder.homeScreen(navigator: Navigator) {
         val articleState = viewModel.articles.collectAsLazyPagingItems()
         val lazyListState = rememberLazyListState()
         val favoriteState by viewModel.favoriteState.collectAsState(null)
-        LaunchedEffect(favoriteState) {
-            if (favoriteState == true) {
-                articleState.refresh()
+        var isFavoriteAction by remember { mutableStateOf(false) }
+        val refreshLayoutState = rememberRefreshLayoutState {
+            isFavoriteAction = false
+            articleState.refresh()
+        }
+        favoriteState?.let {
+            LaunchedEffect(it) {
+                if (it.isLoginExpired) {
+                    val result = navigator.navigateForResult(
+                        Router.Login.path, NavOptions(launchSingleTop = true)
+                    )
+                    if (result == true) {
+                        articleState.refresh()
+                    }
+                }
+                if (favoriteState is UiStateSuccess) {
+                    isFavoriteAction = true
+                    articleState.refresh()
+                }
             }
+        }
+        LaunchedEffect(articleState.loadState.refresh) {
+            val canRefresh = articleState.loadState.refresh is LoadStateLoading && !isFavoriteAction
+            refreshLayoutState.setRefreshState(if (canRefresh) RefreshContentStateEnum.Refreshing else RefreshContentStateEnum.Stop)
         }
         HomeScreen(
             navigator = navigator,
+            refreshLayoutState = refreshLayoutState,
             lazyPagingItems = articleState,
             lazyListState = lazyListState,
             addFavorite = {
@@ -73,6 +104,7 @@ fun RouteBuilder.homeScreen(navigator: Navigator) {
 @Composable
 private fun HomeScreen(
     navigator: Navigator,
+    refreshLayoutState: RefreshLayoutState,
     lazyPagingItems: LazyPagingItems<HomeArticleItemData>,
     lazyListState: LazyListState,
     addFavorite: (HomeArticleItemData) -> Unit = {},
@@ -103,38 +135,44 @@ private fun HomeScreen(
             )
         },
         content = { paddingValues ->
-            PagingFullLoadLayout(
+            PullToRefresh(
                 modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-                pagingState = lazyPagingItems
-            ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(12.dp),
-                    state = lazyListState
-                ) {
-                    items(count = lazyPagingItems.itemCount,
-                        key = lazyPagingItems.itemKey { it.id },
-                        itemContent = { index ->
-                            val item = lazyPagingItems[index]
-                            if (item != null) {
-                                ArticleItem(data = item, onClick = {
-                                    val path = Router.WebView.parametersOf(RouterKey.url to it.link)
-                                    navigator.navigate(
-                                        route = path,
-                                        options = NavOptions(launchSingleTop = true)
-                                    )
-                                }, onFavoriteClick = { favoriteState ->
-                                    if (favoriteState) {
-                                        addFavorite.invoke(item)
-                                    } else {
-                                        cancelFavorite.invoke(item)
+                refreshLayoutState = refreshLayoutState,
+                content = {
+                    PagingFullLoadLayout(
+                        modifier = Modifier.fillMaxSize(),
+                        pagingState = lazyPagingItems
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(12.dp),
+                            state = lazyListState
+                        ) {
+                            items(count = lazyPagingItems.itemCount,
+                                key = lazyPagingItems.itemKey { it.id },
+                                itemContent = { index ->
+                                    val item = lazyPagingItems[index]
+                                    if (item != null) {
+                                        ArticleItem(data = item, onClick = {
+                                            val path =
+                                                Router.WebView.parametersOf(RouterKey.url to it.link)
+                                            navigator.navigate(
+                                                route = path,
+                                                options = NavOptions(launchSingleTop = true)
+                                            )
+                                        }, onFavoriteClick = { favoriteState ->
+                                            if (favoriteState) {
+                                                addFavorite.invoke(item)
+                                            } else {
+                                                cancelFavorite.invoke(item)
+                                            }
+                                        })
                                     }
                                 })
-                            }
-                        })
-                    pagingFooter(lazyPagingItems)
-                }
-            }
+                            pagingFooter(lazyPagingItems)
+                        }
+                    }
+                })
         })
 }
