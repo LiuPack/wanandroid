@@ -13,9 +13,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ViewKanban
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,10 +37,14 @@ import androidx.compose.ui.unit.sp
 import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
+import com.lt.compose_views.refresh_layout.PullToRefresh
+import com.lt.compose_views.refresh_layout.RefreshContentStateEnum
+import com.lt.compose_views.refresh_layout.rememberRefreshLayoutState
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
+import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
@@ -74,13 +75,16 @@ private fun UserCoinCountScreen(navigator: Navigator) {
             navigator.navigate(Router.CoinCountRanking.path)
         }
     }
-    val refreshState = rememberPullRefreshState(
-        refreshing = userCoinCountListState.loadState.refresh is LoadStateLoading,
-        onRefresh = {
-            viewModel.dispatch(UserCoinCountAction.Refresh)
-            userCoinCountListState.refresh()
-        })
-    Scaffold(modifier = Modifier.fillMaxSize().pullRefresh(state = refreshState), topBar = {
+    val refreshLayoutState = rememberRefreshLayoutState {
+        viewModel.dispatch(UserCoinCountAction.Refresh)
+        userCoinCountListState.refresh()
+    }
+    LaunchedEffect(userCoinCountListState.loadState.refresh) {
+        val refreshState =
+            if (userCoinCountListState.loadState.refresh is LoadStateLoading) RefreshContentStateEnum.Refreshing else RefreshContentStateEnum.Stop
+        refreshLayoutState.setRefreshState(refreshState)
+    }
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         LargeTopAppBar(
             title = { TitleCoinCount(userCoinCountState) },
             actions = {
@@ -104,21 +108,22 @@ private fun UserCoinCountScreen(navigator: Navigator) {
             scrollBehavior = scrollBehavior,
         )
     }, content = {
-        PagingFullLoadLayout(
+        PullToRefresh(
+            refreshLayoutState = refreshLayoutState,
             modifier = Modifier.fillMaxSize().padding(it),
-            pagingState = userCoinCountListState,
-            content = {
-                UserCoinCountContent(
-                    modifier = Modifier.fillMaxSize()
-                        .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    userCoinCountList = userCoinCountListState,
-                )
-                PullRefreshIndicator(
-                    refreshing = userCoinCountListState.loadState.refresh is LoadStateLoading,
-                    state = refreshState,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
-            })
+            refreshContent = remember { { CustomPullToRefreshContent() } },
+        ) {
+            PagingFullLoadLayout(
+                modifier = Modifier.fillMaxSize(),
+                pagingState = userCoinCountListState,
+                content = {
+                    UserCoinCountContent(
+                        modifier = Modifier.fillMaxSize()
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        userCoinCountList = userCoinCountListState,
+                    )
+                })
+        }
     })
 }
 

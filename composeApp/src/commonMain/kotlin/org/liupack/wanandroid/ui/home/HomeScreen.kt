@@ -45,6 +45,7 @@ import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.ArticleItem
+import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
@@ -138,6 +139,7 @@ private fun HomeScreen(
             PullToRefresh(
                 modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
                 refreshLayoutState = refreshLayoutState,
+                refreshContent = remember { { CustomPullToRefreshContent() } },
                 content = {
                     PagingFullLoadLayout(
                         modifier = Modifier.fillMaxSize(),

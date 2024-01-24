@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import org.liupack.wanandroid.composables.ArticleItem
+import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.DeletedDialog
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.LoadingDialog
@@ -75,6 +77,7 @@ fun UserSharedScreen(navigator: Navigator) {
         PullToRefresh(
             refreshLayoutState = refreshLayoutState,
             modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()),
+            refreshContent = remember { { CustomPullToRefreshContent() } },
         ) {
             PagingFullLoadLayout(
                 modifier = Modifier.fillMaxSize(),

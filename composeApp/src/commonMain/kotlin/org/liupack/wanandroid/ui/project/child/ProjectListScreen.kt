@@ -31,6 +31,7 @@ import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.ArticleItem
+import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.composables.rememberLazyListState
@@ -89,6 +90,7 @@ fun ProjectListScreen(navigator: Navigator, id: Int) {
     PullToRefresh(
         refreshLayoutState = refreshLayoutState,
         modifier = Modifier.fillMaxSize(),
+        refreshContent = remember { { CustomPullToRefreshContent() } },
         content = {
             PagingFullLoadLayout(
                 modifier = Modifier.fillMaxSize(),

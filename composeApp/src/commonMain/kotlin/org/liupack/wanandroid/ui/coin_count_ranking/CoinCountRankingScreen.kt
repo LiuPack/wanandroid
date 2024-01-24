@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Chip
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,6 +19,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -36,11 +34,15 @@ import androidx.compose.ui.unit.sp
 import app.cash.paging.LoadStateLoading
 import app.cash.paging.compose.collectAsLazyPagingItems
 import app.cash.paging.compose.itemKey
+import com.lt.compose_views.refresh_layout.PullToRefresh
+import com.lt.compose_views.refresh_layout.RefreshContentStateEnum
+import com.lt.compose_views.refresh_layout.rememberRefreshLayoutState
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
@@ -53,15 +55,19 @@ fun RouteBuilder.coinCountRankingScreen(navigator: Navigator) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CoinCountRankingScreen(navigator: Navigator) {
     val viewModel = koinViewModel(CoinCountRankingViewModel::class)
     val coinCountRankingState = viewModel.coinCountRankingState.collectAsLazyPagingItems()
-    val refreshing = coinCountRankingState.loadState.refresh is LoadStateLoading
-    val refreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = {
+    val refreshLayoutState = rememberRefreshLayoutState {
         coinCountRankingState.refresh()
-    })
+    }
+    LaunchedEffect(coinCountRankingState.loadState.refresh) {
+        val refreshState =
+            if (coinCountRankingState.loadState.refresh is LoadStateLoading) RefreshContentStateEnum.Refreshing else RefreshContentStateEnum.Stop
+        refreshLayoutState.setRefreshState(refreshState)
+    }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(
             title = { Text("积分排行榜") },
@@ -78,30 +84,30 @@ private fun CoinCountRankingScreen(navigator: Navigator) {
             )
         )
     }, content = { paddingValues ->
-        PagingFullLoadLayout(
-            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
-                .pullRefresh(refreshState),
-            pagingState = coinCountRankingState,
-            content = {
-                LazyColumn(modifier = Modifier.fillMaxSize(), content = {
-                    items(coinCountRankingState.itemCount,
-                        key = coinCountRankingState.itemKey { it.userId }) { index ->
-                        val data = coinCountRankingState[index]
-                        if (data != null) {
-                            CoinCountRankingItem(
-                                data = data,
-                                max = coinCountRankingState[0]?.coinCount ?: 0
-                            )
+        PullToRefresh(
+            refreshLayoutState = refreshLayoutState,
+            modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()),
+            refreshContent = remember { { CustomPullToRefreshContent() } }) {
+            PagingFullLoadLayout(
+                modifier = Modifier.fillMaxSize(),
+                pagingState = coinCountRankingState,
+                content = {
+                    LazyColumn(modifier = Modifier.fillMaxSize(), content = {
+                        items(coinCountRankingState.itemCount,
+                            key = coinCountRankingState.itemKey { it.userId }) { index ->
+                            val data = coinCountRankingState[index]
+                            if (data != null) {
+                                CoinCountRankingItem(
+                                    data = data,
+                                    max = coinCountRankingState[0]?.coinCount ?: 0
+                                )
+                            }
                         }
-                    }
-                    pagingFooter(pagingState = coinCountRankingState)
-                })
-                PullRefreshIndicator(
-                    refreshing = refreshing, state = refreshState,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
-            },
-        )
+                        pagingFooter(pagingState = coinCountRankingState)
+                    })
+                },
+            )
+        }
     })
 }
 

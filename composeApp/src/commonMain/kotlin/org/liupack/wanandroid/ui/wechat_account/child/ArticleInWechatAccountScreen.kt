@@ -30,6 +30,7 @@ import org.koin.core.parameter.parametersOf
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.ArticleItem
+import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
 import org.liupack.wanandroid.composables.rememberLazyListState
@@ -78,6 +79,7 @@ fun RouteBuilder.articleInWechatAccount(parentNavigator: Navigator, router: Stri
         PullToRefresh(
             refreshLayoutState = refreshLayoutState,
             modifier = Modifier.fillMaxSize(),
+            refreshContent = remember { { CustomPullToRefreshContent() } },
             content = {
                 ArticleInWechatAccountScreen(
                     navigator = parentNavigator,

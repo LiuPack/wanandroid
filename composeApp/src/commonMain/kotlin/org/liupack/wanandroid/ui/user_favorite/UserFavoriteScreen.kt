@@ -49,6 +49,7 @@ import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.parametersOf
+import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
@@ -104,6 +105,7 @@ fun UserFavoriteScreen(navigator: Navigator) {
             PullToRefresh(
                 refreshLayoutState = refreshLayoutState,
                 modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+                refreshContent = remember { { CustomPullToRefreshContent() } },
                 content = {
                     PagingFullLoadLayout(
                         modifier = Modifier.fillMaxSize(),

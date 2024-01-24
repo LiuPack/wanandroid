@@ -36,6 +36,7 @@ import org.koin.core.parameter.parametersOf
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.ArticleItem
+import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
@@ -99,6 +100,7 @@ private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?
             refreshLayoutState = refreshLayoutState,
             modifier = Modifier.fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
+            refreshContent = remember { { CustomPullToRefreshContent() } },
             content = {
                 PagingFullLoadLayout(modifier = Modifier.fillMaxSize(),
                     pagingState = articleState,
