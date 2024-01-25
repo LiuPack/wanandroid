@@ -191,7 +191,7 @@ private fun HomeScreen(
                                 itemContent = { index ->
                                     val item = lazyPagingItems[index]
                                     if (item != null) {
-                                        ArticleItem(data = item, onClick = {
+                                        ArticleItem(data = item, showPinned = false, onClick = {
                                             val path =
                                                 Router.WebView.parametersOf(RouterKey.url to it.link)
                                             navigator.navigate(

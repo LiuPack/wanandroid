@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
@@ -72,7 +74,11 @@ fun ArticleItem(
             fontSize = MaterialTheme.typography.titleMedium.fontSize,
             overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight.Bold,
-            inlineContent = tagMapOf()
+            inlineContent = tagMapOf(
+                showPinned = showPinned,
+                showNew = data.fresh,
+                lineHeight = LocalTextStyle.current.lineHeight
+            )
         )
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -110,44 +116,51 @@ fun ArticleItem(
     }
 }
 
-private fun tagMapOf() = mapOf("pinned" to InlineTextContent(
-    placeholder = Placeholder(
-        width = 48.sp,
-        height = 20.sp,
-        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-    )
-) {
-    Box(
-        modifier = Modifier.padding(end = 4.dp).fillMaxSize().border(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.tertiary,
-            shape = RoundedCornerShape(2.dp)
-        ), contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = it,
-            fontSize = MaterialTheme.typography.titleSmall.fontSize,
-            color = MaterialTheme.colorScheme.tertiary,
-        )
+private fun tagMapOf(showPinned: Boolean, showNew: Boolean, lineHeight: TextUnit) = buildMap {
+    if (showPinned) {
+        put("pinned", InlineTextContent(
+            placeholder = Placeholder(
+                width = 48.sp,
+                height = lineHeight,
+                placeholderVerticalAlign = PlaceholderVerticalAlign.Bottom
+            )
+        ) {
+            Box(
+                modifier = Modifier.padding(end = 4.dp).fillMaxSize().border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    shape = RoundedCornerShape(2.dp)
+                ), contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = it,
+                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+            }
+        })
     }
-}, "fresh" to InlineTextContent(
-    placeholder = Placeholder(
-        width = 24.sp,
-        height = 20.sp,
-        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-    )
-) {
-    Box(
-        modifier = Modifier.padding(end = 4.dp).fillMaxSize().border(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.error,
-            shape = RoundedCornerShape(2.dp)
-        ), contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = it,
-            fontSize = MaterialTheme.typography.titleSmall.fontSize,
-            color = MaterialTheme.colorScheme.error,
-        )
+    if (showNew) {
+        put("fresh", InlineTextContent(
+            placeholder = Placeholder(
+                width = 24.sp,
+                height = 24.sp,
+                placeholderVerticalAlign = PlaceholderVerticalAlign.TextBottom
+            )
+        ) {
+            Box(
+                modifier = Modifier.padding(end = 4.dp).fillMaxSize().border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.error,
+                    shape = RoundedCornerShape(2.dp)
+                ), contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = it,
+                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        })
     }
-})
+}
