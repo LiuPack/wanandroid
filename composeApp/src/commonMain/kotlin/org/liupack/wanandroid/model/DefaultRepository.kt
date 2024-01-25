@@ -94,6 +94,14 @@ class DefaultRepository : Repository {
         }).flow.flowOn(Dispatchers.IO)
     }
 
+    override fun pinnedArticles(): Flow<List<HomeArticleItemData>> {
+        return flow {
+            val result = connect().get(NetworkConfig.pinnedArticleApi)
+                .dataResultBody<List<HomeArticleItemData>>().catchData.orEmpty()
+            emit(result)
+        }.flowOn(Dispatchers.IO)
+    }
+
     override fun projectSort(): Flow<List<ProjectSortData>> {
         return flow {
             val result = connect().get(NetworkConfig.projectSortApi)

@@ -80,9 +80,10 @@ private val DarkColors = darkColorScheme(
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
 )
-internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
 
 internal val LocalThemeMode = compositionLocalOf { mutableStateOf<ThemeMode>(ThemeMode.System) }
+
+internal val LocalShowPinned = compositionLocalOf { mutableStateOf(true) }
 
 sealed class ThemeMode {
     data object Light : ThemeMode()
@@ -107,6 +108,12 @@ fun AppTheme(
         settings.putBoolean(Constants.darkTheme, false)
         false
     }
+    val showPinned = if (settings.contains(Constants.showPinned)) {
+        settings.getBoolean(Constants.showPinned, true)
+    } else {
+        settings.putBoolean(Constants.showPinned, true)
+        true
+    }
     val themeMode = remember {
         mutableStateOf(
             if (isSystem) {
@@ -120,7 +127,11 @@ fun AppTheme(
             }
         )
     }
-    CompositionLocalProvider(LocalThemeMode provides themeMode) {
+    val showPinnedMode = remember { mutableStateOf(showPinned) }
+    CompositionLocalProvider(
+        LocalThemeMode provides themeMode,
+        LocalShowPinned provides showPinnedMode
+    ) {
         val currentThemeMode by themeMode
         val colors = when (currentThemeMode) {
             ThemeMode.Dark -> DarkColors

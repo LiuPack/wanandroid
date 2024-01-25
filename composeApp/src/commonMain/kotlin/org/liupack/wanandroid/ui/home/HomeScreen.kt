@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Public
@@ -24,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,7 @@ import com.lt.compose_views.refresh_layout.PullToRefresh
 import com.lt.compose_views.refresh_layout.RefreshContentStateEnum
 import com.lt.compose_views.refresh_layout.RefreshLayoutState
 import com.lt.compose_views.refresh_layout.rememberRefreshLayoutState
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.NavOptions
@@ -53,17 +56,20 @@ import org.liupack.wanandroid.model.UiStateSuccess
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
+import org.liupack.wanandroid.theme.LocalShowPinned
 
 fun RouteBuilder.homeScreen(navigator: Navigator) {
     scene(route = Router.Home.path, navTransition = NavTransition()) {
         BackHandler { exitApp() }
         val viewModel = koinViewModel(HomeViewModel::class)
         val articleState = viewModel.articles.collectAsLazyPagingItems()
+        val pinnedState by viewModel.pinned.collectAsState(emptyList())
         val lazyListState = rememberLazyListState()
         val favoriteState by viewModel.favoriteState.collectAsState(null)
         var isFavoriteAction by remember { mutableStateOf(false) }
         val refreshLayoutState = rememberRefreshLayoutState {
             isFavoriteAction = false
+            viewModel.dispatch(HomeAction.Refresh)
             articleState.refresh()
         }
         favoriteState?.let {
@@ -73,11 +79,13 @@ fun RouteBuilder.homeScreen(navigator: Navigator) {
                         Router.Login.path, NavOptions(launchSingleTop = true)
                     )
                     if (result == true) {
+                        viewModel.dispatch(HomeAction.Refresh)
                         articleState.refresh()
                     }
                 }
                 if (favoriteState is UiStateSuccess) {
                     isFavoriteAction = true
+                    viewModel.dispatch(HomeAction.Refresh)
                     articleState.refresh()
                 }
             }
@@ -89,6 +97,7 @@ fun RouteBuilder.homeScreen(navigator: Navigator) {
         HomeScreen(
             navigator = navigator,
             refreshLayoutState = refreshLayoutState,
+            pinnedState = pinnedState,
             lazyPagingItems = articleState,
             lazyListState = lazyListState,
             addFavorite = {
@@ -106,6 +115,7 @@ fun RouteBuilder.homeScreen(navigator: Navigator) {
 private fun HomeScreen(
     navigator: Navigator,
     refreshLayoutState: RefreshLayoutState,
+    pinnedState: List<HomeArticleItemData>,
     lazyPagingItems: LazyPagingItems<HomeArticleItemData>,
     lazyListState: LazyListState,
     addFavorite: (HomeArticleItemData) -> Unit = {},
@@ -141,6 +151,8 @@ private fun HomeScreen(
                 refreshLayoutState = refreshLayoutState,
                 refreshContent = remember { { CustomPullToRefreshContent() } },
                 content = {
+                    val showPinned by LocalShowPinned.current
+                    val scope = rememberCoroutineScope()
                     PagingFullLoadLayout(
                         modifier = Modifier.fillMaxSize(),
                         pagingState = lazyPagingItems
@@ -151,6 +163,29 @@ private fun HomeScreen(
                             contentPadding = PaddingValues(12.dp),
                             state = lazyListState
                         ) {
+                            if (showPinned) {
+                                if (lazyListState.firstVisibleItemIndex == 0) {
+                                    scope.launch {
+                                        lazyListState.animateScrollToItem(0)
+                                    }
+                                }
+                                items(pinnedState, key = { it.id }) { item ->
+                                    ArticleItem(data = item, onClick = {
+                                        val path =
+                                            Router.WebView.parametersOf(RouterKey.url to it.link)
+                                        navigator.navigate(
+                                            route = path,
+                                            options = NavOptions(launchSingleTop = true)
+                                        )
+                                    }, onFavoriteClick = { favoriteState ->
+                                        if (favoriteState) {
+                                            addFavorite.invoke(item)
+                                        } else {
+                                            cancelFavorite.invoke(item)
+                                        }
+                                    })
+                                }
+                            }
                             items(count = lazyPagingItems.itemCount,
                                 key = lazyPagingItems.itemKey { it.id },
                                 itemContent = { index ->

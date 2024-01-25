@@ -9,4 +9,5 @@ object Constants {
     const val projectUserHome = "https://github.com/LiuPack"
     const val darkTheme = "darkTheme"
     const val isAutoDarkMode = "isAutoDarkMode"
+    const val showPinned = "show_pinned"
 }

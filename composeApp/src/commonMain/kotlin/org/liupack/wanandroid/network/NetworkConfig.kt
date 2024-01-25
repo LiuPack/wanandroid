@@ -21,6 +21,8 @@ object NetworkConfig {
 
     const val articleApi = "article/list/{page}/json"
 
+    const val pinnedArticleApi = "article/top/json"
+
     const val projectSortApi = "project/tree/json"
 
     const val projectListApi = "project/list/{page}/json"

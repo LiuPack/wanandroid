@@ -26,6 +26,7 @@ import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.platform.settings
 import org.liupack.wanandroid.router.Router
+import org.liupack.wanandroid.theme.LocalShowPinned
 import org.liupack.wanandroid.theme.LocalThemeMode
 import org.liupack.wanandroid.theme.ThemeMode
 
@@ -81,42 +82,59 @@ private fun SettingContent(
 ) {
     var themeMode by LocalThemeMode.current
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
-            .padding(top = paddingValues.calculateTopPadding()),
+        modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()),
     ) {
         item {
             ListItem(modifier = Modifier.fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface), headlineContent = {
-                Text("跟随系统")
-            }, trailingContent = {
-                Switch(checked = themeMode is ThemeMode.System, onCheckedChange = {
-                    themeMode = if (it) {
-                        ThemeMode.System
-                    } else {
-                        if (!settings.getBoolean(Constants.darkTheme, false)) {
-                            ThemeMode.Light
+                .background(MaterialTheme.colorScheme.surface),
+                headlineContent = {
+                    Text("跟随系统")
+                },
+                trailingContent = {
+                    Switch(checked = themeMode is ThemeMode.System, onCheckedChange = {
+                        themeMode = if (it) {
+                            ThemeMode.System
                         } else {
-                            ThemeMode.Dark
+                            if (!settings.getBoolean(Constants.darkTheme, false)) {
+                                ThemeMode.Light
+                            } else {
+                                ThemeMode.Dark
+                            }
                         }
-                    }
-                    onSystemChange.invoke(themeMode)
+                        onSystemChange.invoke(themeMode)
+                    })
                 })
-            })
         }
         item {
             ListItem(modifier = Modifier.fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface), headlineContent = {
-                Text("暗色模式")
-            }, trailingContent = {
-                Switch(checked = themeMode is ThemeMode.Dark, onCheckedChange = {
-                    themeMode = if (it) {
-                        ThemeMode.Dark
-                    } else {
-                        ThemeMode.Light
-                    }
-                    onDarkChange.invoke(themeMode)
-                }, enabled = themeMode !is ThemeMode.System)
-            })
+                .background(MaterialTheme.colorScheme.surface),
+                headlineContent = {
+                    Text("暗色模式")
+                },
+                trailingContent = {
+                    Switch(checked = themeMode is ThemeMode.Dark, onCheckedChange = {
+                        themeMode = if (it) {
+                            ThemeMode.Dark
+                        } else {
+                            ThemeMode.Light
+                        }
+                        onDarkChange.invoke(themeMode)
+                    }, enabled = themeMode !is ThemeMode.System)
+                })
+        }
+        item {
+            var showPinned by LocalShowPinned.current
+            ListItem(modifier = Modifier.fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface),
+                headlineContent = {
+                    Text("显示置顶文章")
+                },
+                trailingContent = {
+                    Switch(checked = showPinned, onCheckedChange = {
+                        showPinned = !showPinned
+                        settings.putBoolean(Constants.showPinned, showPinned)
+                    })
+                })
         }
     }
 }

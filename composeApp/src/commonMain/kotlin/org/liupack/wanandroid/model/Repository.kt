@@ -65,6 +65,13 @@ interface Repository {
     fun articles(): Flow<PagingData<HomeArticleItemData>>
 
     /**
+     * 置顶文章
+     *
+     * @return
+     */
+    fun pinnedArticles(): Flow<List<HomeArticleItemData>>
+
+    /**
      * 项目分类
      *
      * @return
