@@ -170,7 +170,7 @@ private fun HomeScreen(
                                     }
                                 }
                                 items(pinnedState, key = { it.id }) { item ->
-                                    ArticleItem(data = item, onClick = {
+                                    ArticleItem(data = item, showPinned = showPinned, onClick = {
                                         val path =
                                             Router.WebView.parametersOf(RouterKey.url to it.link)
                                         navigator.navigate(

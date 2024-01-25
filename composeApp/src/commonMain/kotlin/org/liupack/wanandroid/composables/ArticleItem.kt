@@ -2,13 +2,19 @@ package org.liupack.wanandroid.composables
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -24,9 +30,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -34,6 +44,7 @@ import org.liupack.wanandroid.model.entity.HomeArticleItemData
 fun ArticleItem(
     modifier: Modifier = Modifier,
     data: HomeArticleItemData,
+    showPinned: Boolean = false,
     favoriteVisibility: Boolean = true,
     onFavoriteClick: HomeArticleItemData .(Boolean) -> Unit = {},
     onLongClick: (HomeArticleItemData) -> Unit = {},
@@ -48,11 +59,20 @@ fun ArticleItem(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = data.title,
+            text = buildAnnotatedString {
+                if (showPinned) {
+                    appendInlineContent("pinned", "置顶")
+                }
+                if (data.fresh) {
+                    appendInlineContent("fresh", "新")
+                }
+                append(data.title)
+            },
             maxLines = 2,
             fontSize = MaterialTheme.typography.titleMedium.fontSize,
             overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            inlineContent = tagMapOf()
         )
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -89,3 +109,45 @@ fun ArticleItem(
 
     }
 }
+
+private fun tagMapOf() = mapOf("pinned" to InlineTextContent(
+    placeholder = Placeholder(
+        width = 48.sp,
+        height = 20.sp,
+        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+    )
+) {
+    Box(
+        modifier = Modifier.padding(end = 4.dp).fillMaxSize().border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.tertiary,
+            shape = RoundedCornerShape(2.dp)
+        ), contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = it,
+            fontSize = MaterialTheme.typography.titleSmall.fontSize,
+            color = MaterialTheme.colorScheme.tertiary,
+        )
+    }
+}, "fresh" to InlineTextContent(
+    placeholder = Placeholder(
+        width = 24.sp,
+        height = 20.sp,
+        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+    )
+) {
+    Box(
+        modifier = Modifier.padding(end = 4.dp).fillMaxSize().border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.error,
+            shape = RoundedCornerShape(2.dp)
+        ), contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = it,
+            fontSize = MaterialTheme.typography.titleSmall.fontSize,
+            color = MaterialTheme.colorScheme.error,
+        )
+    }
+})
