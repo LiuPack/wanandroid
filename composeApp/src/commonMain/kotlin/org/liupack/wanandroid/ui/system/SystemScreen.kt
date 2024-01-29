@@ -60,7 +60,7 @@ fun RouteBuilder.systemScreen(navigator: Navigator) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SystemScreen(
+fun SystemScreen(
     navigator: Navigator,
     lazyListState: LazyListState,
     uiState: UiState<List<SystemBaseData>>,

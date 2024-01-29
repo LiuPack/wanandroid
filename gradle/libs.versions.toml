@@ -1,11 +1,11 @@
 [versions]
-kotlin = "1.9.21"
+kotlin = "1.9.22"
 agp = "8.2.2"
-compose = "1.5.11"
+compose = "1.6.0-beta01"
 androidx-appcompat = "1.6.1"
 androidx-activityCompose = "1.8.2"
 compose-uitooling = "1.5.4"
-composeImageLoader = "1.7.1"
+coil = "3.0.0-alpha03"
 napier = "2.7.1"
 kotlinx-coroutines = "1.7.3"
 ktor = "2.3.7"
@@ -27,7 +27,7 @@ build-config = "5.3.5"
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-uitooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-uitooling" }
-composeImageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "composeImageLoader" }
+coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }

@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -40,6 +40,7 @@ import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.liupack.wanandroid.composables.FullUiStateLayout
 import org.liupack.wanandroid.composables.LoadingDialog
@@ -60,7 +61,7 @@ fun RouteBuilder.userScreen(navigator: Navigator) {
 }
 
 @Composable
-private fun UserScreen(navigator: Navigator) {
+fun UserScreen(navigator: Navigator) {
     val viewModel = koinViewModel(UserViewModel::class)
     val userInfoState by viewModel.userInfoState.collectAsState()
     val loginState by viewModel.toLogin.collectAsState(null)
@@ -206,7 +207,7 @@ private fun UserInfoContent(
                                     verticalArrangement = Arrangement.Center
                                 ) {
                                     Image(
-                                        painter = painterResource("android_studio.png"),
+                                        painter = painterResource(DrawableResource("icon.png")),
                                         contentDescription = null,
                                         modifier = Modifier.padding(vertical = 12.dp).size(50.dp)
                                             .clip(CircleShape).border(
@@ -266,7 +267,7 @@ private fun UserInfoContent(
                     },
                     trailingContent = {
                         Icon(
-                            imageVector = Icons.Rounded.KeyboardArrowRight,
+                            imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                             contentDescription = null
                         )
                     },

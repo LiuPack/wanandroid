@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -20,13 +21,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
 import dev.datlag.kcef.KCEF
 import dev.datlag.tooling.Tooling
 import dev.datlag.tooling.getApplicationWriteableRootFolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jetbrains.compose.resources.painterResource
 import org.koin.core.context.startKoin
 import org.liupack.wanandroid.App
 import org.liupack.wanandroid.model.di.appModule
@@ -42,17 +41,17 @@ fun main() = application {
     }
     Window(
         title = "玩 Android",
-        icon = painterResource("android_studio.png"),
-        state = rememberWindowState(width = 350.dp, height = 700.dp),
+        icon = painterResource("icon.png"),
         onCloseRequest = ::exitApplication,
     ) {
+        window.maximumSize = Dimension(840, window.height)
         window.minimumSize = Dimension(350, 700)
         var restartRequired by remember { mutableStateOf(false) }
         var downloading by remember { mutableStateOf(0f) }
         var initialized by remember { mutableStateOf(false) }
         var failedMsg by remember { mutableStateOf("") }
         var rootPath by remember { mutableStateOf("") }
-        val isDebug = BuildConfig.DEBUG
+        val isDebug = !BuildConfig.DEBUG
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {
                 //https://github.com/DatL4g/KCEF/issues/2

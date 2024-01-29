@@ -1,13 +1,18 @@
 package org.liupack.wanandroid.ui.home
 
+import app.cash.paging.PagingData
 import app.cash.paging.cachedIn
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -21,30 +26,30 @@ import org.liupack.wanandroid.model.usecase.CancelFavoriteArticleUseCase
 import org.liupack.wanandroid.model.usecase.FavoriteArticleUseCase
 import org.liupack.wanandroid.openUrl
 
+typealias CombinePinnedAndArticles = Pair<List<HomeArticleItemData>, Flow<PagingData<HomeArticleItemData>>>
+
 class HomeViewModel(
     private val repository: Repository,
     private val favoriteArticleUseCase: FavoriteArticleUseCase,
     private val cancelFavoriteArticleUseCase: CancelFavoriteArticleUseCase
 ) : ViewModel() {
+    init {
+        combineArticle()
+    }
 
-    private val mPinned = MutableStateFlow<List<HomeArticleItemData>>(emptyList())
-    val pinned = mPinned.asStateFlow()
+    private val mCombineData =
+        MutableStateFlow<CombinePinnedAndArticles>(Pair(emptyList(), emptyFlow()))
 
-    val articles = repository.articles().cachedIn(viewModelScope)
+    val combineData = mCombineData.asStateFlow()
 
     private val mFavoriteState = MutableSharedFlow<UiState<Boolean>>()
     val favoriteState = mFavoriteState.asSharedFlow()
-
-    init {
-        dispatch(HomeAction.Refresh)
-    }
 
     fun dispatch(action: HomeAction) {
         viewModelScope.launch {
             when (action) {
 
                 is HomeAction.Refresh -> {
-                    refresh()
                 }
 
                 is HomeAction.OpenGithub -> {
@@ -66,10 +71,14 @@ class HomeViewModel(
         }
     }
 
-    private fun refresh() {
+    private fun combineArticle() {
         viewModelScope.launch {
-            repository.pinnedArticles().catch { emit(emptyList()) }.collectLatest {
-                mPinned.emit(it)
+            val pinnedAsync = async { repository.pinnedArticles() }
+            val articlesAsync = repository.articles().cachedIn(viewModelScope)
+            pinnedAsync.await().map {
+                Pair(it, articlesAsync)
+            }.collectLatest {
+                mCombineData.emit(it)
             }
         }
     }

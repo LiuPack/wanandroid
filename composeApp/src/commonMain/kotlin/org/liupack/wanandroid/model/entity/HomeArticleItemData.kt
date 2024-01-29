@@ -77,7 +77,8 @@ data class HomeArticleItemData(
     @SerialName("visible")
     val visible: Int?,
     @SerialName("zan")
-    val zan: Int?
+    val zan: Int?,
+    val isPinned: Boolean = false,
 )
 
 @Serializable

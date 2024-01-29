@@ -59,9 +59,9 @@ fun RouteBuilder.userCoinCountScreen(navigator: Navigator) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun UserCoinCountScreen(navigator: Navigator) {
+fun UserCoinCountScreen(navigator: Navigator) {
     val viewModel = koinViewModel(UserCoinCountViewModel::class)
     LaunchedEffect(viewModel.hashCode()) {
         viewModel.dispatch(UserCoinCountAction.Refresh)

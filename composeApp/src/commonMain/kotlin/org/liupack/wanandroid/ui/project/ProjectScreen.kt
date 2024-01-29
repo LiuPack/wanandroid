@@ -47,7 +47,7 @@ fun RouteBuilder.projectScreen(navigator: Navigator) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProjectScreen(navigator: Navigator) {
+fun ProjectScreen(navigator: Navigator) {
     val viewModel = koinViewModel(ProjectViewModel::class)
     LaunchedEffect(viewModel) {
         viewModel.projectSort()

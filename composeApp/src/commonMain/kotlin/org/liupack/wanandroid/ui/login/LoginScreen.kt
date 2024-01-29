@@ -50,7 +50,7 @@ fun RouteBuilder.loginScreen(navigator: Navigator) {
 }
 
 @Composable
-private fun LoginScreen(navigator: Navigator) {
+fun LoginScreen(navigator: Navigator) {
     val viewModel = koinViewModel(LoginViewModel::class)
     val userName by viewModel.userNameInput.collectAsState()
     val password by viewModel.passwordInput.collectAsState()

@@ -25,8 +25,9 @@ class HomeArticleSource : PagingSource<Int, HomeArticleItemData>() {
             val page = params.key ?: 0
             val result = connect().get(NetworkConfig.articleApi.replaceRealPageApi(page))
                 .dataResultBody<PagingListData<HomeArticleItemData>>().catchData
+            val dataList = result?.dataList.orEmpty()
             LoadResult.Page(
-                data = result?.dataList.orEmpty(),
+                data = dataList,
                 prevKey = null,
                 nextKey = if (result?.dataList.isNullOrEmpty()) null else page + 1
             )

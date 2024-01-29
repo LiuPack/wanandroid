@@ -57,7 +57,7 @@ fun RouteBuilder.coinCountRankingScreen(navigator: Navigator) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CoinCountRankingScreen(navigator: Navigator) {
+fun CoinCountRankingScreen(navigator: Navigator) {
     val viewModel = koinViewModel(CoinCountRankingViewModel::class)
     val coinCountRankingState = viewModel.coinCountRankingState.collectAsLazyPagingItems()
     val refreshLayoutState = rememberRefreshLayoutState {
@@ -69,23 +69,19 @@ private fun CoinCountRankingScreen(navigator: Navigator) {
         refreshLayoutState.setRefreshState(refreshState)
     }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        TopAppBar(
-            title = { Text("积分排行榜") },
-            navigationIcon = {
-                IconBackButton(onClick = {
-                    navigator.goBack()
-                })
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background,
-                titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-            )
+        TopAppBar(title = { Text("积分排行榜") }, navigationIcon = {
+            IconBackButton(onClick = {
+                navigator.goBack()
+            })
+        }, colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+            actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+            navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+        )
         )
     }, content = { paddingValues ->
-        PullToRefresh(
-            refreshLayoutState = refreshLayoutState,
+        PullToRefresh(refreshLayoutState = refreshLayoutState,
             modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()),
             refreshContent = remember { { CustomPullToRefreshContent() } }) {
             PagingFullLoadLayout(
@@ -98,8 +94,7 @@ private fun CoinCountRankingScreen(navigator: Navigator) {
                             val data = coinCountRankingState[index]
                             if (data != null) {
                                 CoinCountRankingItem(
-                                    data = data,
-                                    max = coinCountRankingState[0]?.coinCount ?: 0
+                                    data = data, max = coinCountRankingState[0]?.coinCount ?: 0
                                 )
                             }
                         }
@@ -131,8 +126,7 @@ private fun CoinCountRankingItem(data: CoinCountRankingData, max: Int) {
     Row(
         modifier = Modifier.fillMaxWidth().drawWithContent {
             drawRect(
-                color = color,
-                size = size.copy(this.size.width * animatable.value)
+                color = color, size = size.copy(this.size.width * animatable.value)
             )
             drawContent()
         }.padding(horizontal = 12.dp, vertical = 8.dp),

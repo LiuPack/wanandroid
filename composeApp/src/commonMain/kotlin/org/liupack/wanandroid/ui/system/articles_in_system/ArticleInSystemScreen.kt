@@ -54,7 +54,7 @@ fun RouteBuilder.articleInSystemScreen(navigator: Navigator) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?) {
+fun ArticleInSystemScreen(navigator: Navigator, id: Int?, title: String?) {
     val viewModel =
         koinViewModel(ArticleInSystemViewModel::class, key = id.toString()) { parametersOf(id) }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {

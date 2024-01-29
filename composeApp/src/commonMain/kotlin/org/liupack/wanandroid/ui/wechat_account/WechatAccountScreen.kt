@@ -48,7 +48,7 @@ fun RouteBuilder.wechatAccountScreen(navigator: Navigator) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun WechatAccountScreen(navigator: Navigator) {
+fun WechatAccountScreen(navigator: Navigator) {
     val viewModel = koinViewModel(WechatAccountViewModel::class)
     LaunchedEffect(viewModel) {
         viewModel.getWechatAccountList()

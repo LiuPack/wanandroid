@@ -43,7 +43,7 @@ fun RouteBuilder.settingScreen(navigator: Navigator) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SettingScreen(
+fun SettingScreen(
     backClick: () -> Unit = {},
     onSystemChange: (ThemeMode) -> Unit,
     onDarkChange: (ThemeMode) -> Unit
