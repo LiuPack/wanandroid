@@ -1,9 +1,9 @@
 package org.liupack.wanandroid.model.entity
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Share
@@ -28,5 +28,5 @@ sealed class UserNavigator(val icon: ImageVector, val name: String) {
     data object SystemSetting : UserNavigator(Icons.Outlined.Settings, "系统设置")
 
     @Stable
-    data object Logout : UserNavigator(Icons.AutoMirrored.Outlined.Logout, "退出登录")
+    data object Logout : UserNavigator(Icons.Outlined.Logout, "退出登录")
 }

@@ -1,9 +1,9 @@
 package org.liupack.wanandroid.model.entity
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LibraryBooks
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ViewKanban
 import androidx.compose.runtime.Stable
@@ -21,7 +21,7 @@ sealed class BottomNavigatorData(val icon: ImageVector, val label: String, val r
     @Stable
     data object WechatAccount :
         BottomNavigatorData(
-            Icons.AutoMirrored.Outlined.LibraryBooks,
+            Icons.Outlined.LibraryBooks,
             "公众号",
             Router.WechatAccount
         )

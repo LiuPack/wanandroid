@@ -26,7 +26,6 @@ import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.PopUpTo
 import moe.tlaster.precompose.navigation.RouteBuilder
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.liupack.wanandroid.common.rememberCountDownTimer
@@ -73,7 +72,7 @@ fun SplashScreen(navigator: Navigator, backStackEntry: BackStackEntry) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 content = {
                     Image(
-                        painter = painterResource(DrawableResource("icon.png")),
+                        painter = painterResource("icon.png"),
                         contentDescription = null,
                         modifier = Modifier.size(100.dp),
                     )
