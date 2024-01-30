@@ -1,5 +1,7 @@
 package org.liupack.wanandroid.ui.user_shared
 
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -35,6 +37,7 @@ import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.composables.ArticleItem
 import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.DeletedDialog
@@ -49,7 +52,12 @@ import org.liupack.wanandroid.model.UiStateSuccess
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.userSharedScreen(navigator: Navigator) {
-    scene(Router.UserShared.path) {
+    scene(
+        route = Router.UserShared.path, navTransition = NavTransition(
+            createTransition = expandHorizontally(),
+            destroyTransition = shrinkHorizontally(),
+        )
+    ) {
         UserSharedScreen(navigator)
     }
 }

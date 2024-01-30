@@ -34,6 +34,7 @@ import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.navigation.transition.NavTransition
+import org.liupack.wanandroid.composables.FullUiStateLayout
 import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
 import org.liupack.wanandroid.ui.project.child.projectListScreen
@@ -52,82 +53,95 @@ fun ProjectScreen(navigator: Navigator) {
     LaunchedEffect(viewModel) {
         viewModel.projectSort()
     }
-    val projectSortList by viewModel.projectSort.collectAsState()
-    if (projectSortList.isNotEmpty()) {
-        val childNavigator = rememberNavigator()
-        val routers by remember(viewModel) {
-            derivedStateOf {
-                projectSortList.map { it.id.toString() }.toList()
-            }
-        }
-        val selectIndex by viewModel.selectIndex.collectAsState()
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            containerColor = MaterialTheme.colorScheme.background,
-            topBar = {
-                TopAppBar(
-                    title = {
-                        ScrollableTabRow(
-                            selectedTabIndex = selectIndex,
-                            modifier = Modifier.padding(end = 16.dp).fillMaxWidth()
-                                .clip(MaterialTheme.shapes.medium),
-                            edgePadding = 0.dp,
-                            divider = {},
-                            indicator = {},
-                            tabs = {
-                                projectSortList.forEachIndexed { index, data ->
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth()
-                                            .clip(MaterialTheme.shapes.medium)
-                                            .clickable {
-                                                viewModel.updateSelected(index)
-                                                childNavigator.navigate(
-                                                    routers[index],
-                                                    options = NavOptions(launchSingleTop = true)
+    val projectSortState by viewModel.projectSort.collectAsState()
+    FullUiStateLayout(
+        modifier = Modifier.fillMaxSize(),
+        uiState = projectSortState,
+        onRetry = {},
+        loginContent = {},
+        content = { projectSortList ->
+            if (projectSortList.isNotEmpty()) {
+                val childNavigator = rememberNavigator()
+                val routers by remember(viewModel) {
+                    derivedStateOf {
+                        projectSortList.map { it.id.toString() }.toList()
+                    }
+                }
+                val selectIndex by viewModel.selectIndex.collectAsState()
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = MaterialTheme.colorScheme.background,
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                ScrollableTabRow(
+                                    selectedTabIndex = selectIndex,
+                                    modifier = Modifier.padding(end = 16.dp).fillMaxWidth()
+                                        .clip(MaterialTheme.shapes.medium),
+                                    edgePadding = 0.dp,
+                                    divider = {},
+                                    indicator = {},
+                                    tabs = {
+                                        projectSortList.forEachIndexed { index, data ->
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                                    .clip(MaterialTheme.shapes.medium)
+                                                    .clickable {
+                                                        viewModel.updateSelected(index)
+                                                        childNavigator.navigate(
+                                                            routers[index],
+                                                            options = NavOptions(launchSingleTop = true)
+                                                        )
+                                                    }.background(
+                                                        MaterialTheme.colorScheme.inversePrimary.copy(
+                                                            if (index == selectIndex) 0.3f else 0f
+                                                        ),
+                                                        MaterialTheme.shapes.medium
+                                                    ).padding(
+                                                        horizontal = 12.dp,
+                                                        vertical = 6.dp
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = data.name,
+                                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
                                                 )
-                                            }.background(
-                                                MaterialTheme.colorScheme.inversePrimary.copy(if (index == selectIndex) 0.3f else 0f),
-                                                MaterialTheme.shapes.medium
-                                            ).padding(horizontal = 12.dp, vertical = 6.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = data.name,
-                                            fontSize = MaterialTheme.typography.titleMedium.fontSize
-                                        )
+                                            }
+                                        }
                                     }
-                                }
-                            }
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = MaterialTheme.colorScheme.background,
+                                titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                                actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                                navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
+                            ),
                         )
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                        actionIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                        navigationIconContentColor = contentColorFor(MaterialTheme.colorScheme.background),
-                    ),
-                )
-            },
-            content = { paddingValues ->
-                NavHost(
-                    navigator = childNavigator,
-                    initialRoute = routers.first(),
-                    modifier = Modifier.fillMaxSize()
-                        .padding(top = paddingValues.calculateTopPadding()),
-                    navTransition = NavTransition(
-                        createTransition = fadeIn(),
-                        destroyTransition = fadeOut()
-                    ),
-                    persistNavState = true,
-                    builder = {
-                        routers.forEach {
-                            projectListScreen(
-                                parentNavigator = navigator,
-                                router = it,
-                                id = it.toInt()
-                            )
-                        }
+                    content = { paddingValues ->
+                        NavHost(
+                            navigator = childNavigator,
+                            initialRoute = routers.first(),
+                            modifier = Modifier.fillMaxSize()
+                                .padding(top = paddingValues.calculateTopPadding()),
+                            navTransition = NavTransition(
+                                createTransition = fadeIn(),
+                                destroyTransition = fadeOut()
+                            ),
+                            persistNavState = true,
+                            builder = {
+                                routers.forEach {
+                                    projectListScreen(
+                                        parentNavigator = navigator,
+                                        router = it,
+                                        id = it.toInt()
+                                    )
+                                }
+                            })
                     })
-            })
-    }
+            }
+        },
+    )
 }

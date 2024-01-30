@@ -77,7 +77,7 @@ fun SystemScreen(
         )
     }, content = { paddingValues ->
         FullUiStateLayout(modifier = Modifier.fillMaxSize()
-            .padding(top = paddingValues.calculateTopPadding()),
+            .padding(paddingValues),
             uiState = uiState,
             onRetry = onRetry,
             content = { dataList ->

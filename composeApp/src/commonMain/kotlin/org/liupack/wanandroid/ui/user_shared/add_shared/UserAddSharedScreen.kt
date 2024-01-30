@@ -1,5 +1,7 @@
 package org.liupack.wanandroid.ui.user_shared.add_shared
 
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.LoadingDialog
 import org.liupack.wanandroid.composables.MessageDialog
@@ -41,7 +44,12 @@ import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.userAddSharedScreen(navigator: Navigator) {
-    scene(Router.UserAddShared.path) {
+    scene(
+        route = Router.UserAddShared.path, navTransition = NavTransition(
+            createTransition = expandHorizontally(),
+            destroyTransition = shrinkHorizontally(),
+        )
+    ) {
         UserAddSharedScreen(navigator)
     }
 }

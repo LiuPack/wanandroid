@@ -1,5 +1,7 @@
 package org.liupack.wanandroid.ui.setting
 
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +24,7 @@ import androidx.compose.ui.Modifier
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.Constants
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.platform.settings
@@ -31,7 +34,12 @@ import org.liupack.wanandroid.theme.LocalThemeMode
 import org.liupack.wanandroid.theme.ThemeMode
 
 fun RouteBuilder.settingScreen(navigator: Navigator) {
-    scene(Router.Setting.path) {
+    scene(
+        route = Router.Setting.path, navTransition = NavTransition(
+            createTransition = expandHorizontally(),
+            destroyTransition = shrinkHorizontally(),
+        )
+    ) {
         val viewModel = koinViewModel(SettingViewModel::class)
         SettingScreen(
             backClick = { navigator.goBack() },

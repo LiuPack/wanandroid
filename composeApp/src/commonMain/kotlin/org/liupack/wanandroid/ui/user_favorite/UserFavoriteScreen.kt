@@ -1,5 +1,7 @@
 package org.liupack.wanandroid.ui.user_favorite
 
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -47,6 +49,7 @@ import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.common.parametersOf
 import org.liupack.wanandroid.composables.CustomPullToRefreshContent
@@ -59,7 +62,12 @@ import org.liupack.wanandroid.model.entity.UserFavoriteArticleData
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.userFavoriteScreen(navigator: Navigator) {
-    scene(Router.UserFavorite.path) {
+    scene(
+        route = Router.UserFavorite.path, navTransition = NavTransition(
+            createTransition = expandHorizontally(),
+            destroyTransition = shrinkHorizontally(),
+        )
+    ) {
         UserFavoriteScreen(navigator)
     }
 }

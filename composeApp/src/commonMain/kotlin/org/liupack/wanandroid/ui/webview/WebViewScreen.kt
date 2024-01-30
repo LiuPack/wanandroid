@@ -1,5 +1,7 @@
 package org.liupack.wanandroid.ui.webview
 
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
@@ -34,13 +36,19 @@ import kotlinx.coroutines.flow.map
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.query
+import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.Logger
 import org.liupack.wanandroid.common.RouterKey
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.webviewScreen(navigator: Navigator) {
-    scene(Router.WebView.path) {
+    scene(
+        route = Router.WebView.path, navTransition = NavTransition(
+            createTransition = expandHorizontally(),
+            destroyTransition = shrinkHorizontally(),
+        )
+    ) {
         val url = it.query<String>(RouterKey.url).orEmpty()
         Logger.i("链接地址：$url")
         WebViewScreen(navigator = navigator, url = url)

@@ -39,7 +39,6 @@ import moe.tlaster.precompose.navigation.BackHandler
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
-import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.jetbrains.compose.resources.painterResource
 import org.liupack.wanandroid.composables.FullUiStateLayout
 import org.liupack.wanandroid.composables.LoadingDialog
@@ -53,7 +52,7 @@ import org.liupack.wanandroid.platform.exitApp
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.userScreen(navigator: Navigator) {
-    scene(route = Router.User.path, navTransition = NavTransition()) {
+    scene(route = Router.User.path) {
         BackHandler { exitApp() }
         UserScreen(navigator = navigator)
     }

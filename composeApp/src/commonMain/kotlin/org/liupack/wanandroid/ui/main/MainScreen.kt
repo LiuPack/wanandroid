@@ -35,7 +35,6 @@ import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.rememberNavigator
-import org.liupack.wanandroid.composables.MessageDialog
 import org.liupack.wanandroid.router.Router
 import org.liupack.wanandroid.ui.coin_count_ranking.coinCountRankingScreen
 import org.liupack.wanandroid.ui.home.homeScreen
@@ -53,7 +52,6 @@ import org.liupack.wanandroid.ui.user_shared.add_shared.userAddSharedScreen
 import org.liupack.wanandroid.ui.user_shared.userSharedScreen
 import org.liupack.wanandroid.ui.webview.webviewScreen
 import org.liupack.wanandroid.ui.wechat_account.wechatAccountScreen
-
 
 @Composable
 fun MainScreen(windowSizeClass: WindowSizeClass) {
@@ -93,7 +91,6 @@ fun MainScreen(windowSizeClass: WindowSizeClass) {
             }
         }
     }
-    MessageDialog(true, windowSizeClass.widthSizeClass.toString())
 }
 
 @Composable

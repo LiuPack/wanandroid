@@ -2,6 +2,8 @@ package org.liupack.wanandroid.ui.coin_count_ranking
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +44,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
@@ -50,7 +53,13 @@ import org.liupack.wanandroid.model.entity.CoinCountRankingData
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.coinCountRankingScreen(navigator: Navigator) {
-    scene(Router.CoinCountRanking.path) {
+    scene(
+        route = Router.CoinCountRanking.path,
+        navTransition = NavTransition(
+            createTransition = expandHorizontally(),
+            destroyTransition = shrinkHorizontally(),
+        )
+    ) {
         CoinCountRankingScreen(navigator = navigator)
     }
 }

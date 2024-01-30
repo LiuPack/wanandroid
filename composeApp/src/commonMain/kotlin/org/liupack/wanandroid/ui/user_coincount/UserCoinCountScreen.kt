@@ -2,6 +2,8 @@ package org.liupack.wanandroid.ui.user_coincount
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -43,6 +45,7 @@ import com.lt.compose_views.refresh_layout.rememberRefreshLayoutState
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.collectAsLazyEmptyPagingItems
 import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.IconBackButton
@@ -54,7 +57,13 @@ import org.liupack.wanandroid.router.Router
 import kotlin.math.roundToInt
 
 fun RouteBuilder.userCoinCountScreen(navigator: Navigator) {
-    scene(Router.UserCoinCount.path) {
+    scene(
+        route = Router.UserCoinCount.path,
+        navTransition = NavTransition(
+            createTransition = expandHorizontally(),
+            destroyTransition = shrinkHorizontally(),
+        )
+    ) {
         UserCoinCountScreen(navigator)
     }
 }

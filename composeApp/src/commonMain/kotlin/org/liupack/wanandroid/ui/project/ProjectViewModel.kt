@@ -9,11 +9,13 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.liupack.wanandroid.model.Repository
+import org.liupack.wanandroid.model.UiState
 import org.liupack.wanandroid.model.entity.ProjectSortData
+import org.liupack.wanandroid.network.exception.DataResultException
 
 class ProjectViewModel(private val repository: Repository) : ViewModel() {
 
-    private val mProjectSort = MutableStateFlow<List<ProjectSortData>>(emptyList())
+    private val mProjectSort = MutableStateFlow<UiState<List<ProjectSortData>>>(UiState.Loading)
     val projectSort = mProjectSort.asStateFlow()
 
     private val mSelectIndex = MutableStateFlow(0)
@@ -26,9 +28,13 @@ class ProjectViewModel(private val repository: Repository) : ViewModel() {
     fun projectSort() {
         viewModelScope.launch {
             repository.projectSort().catch {
-                mProjectSort.emit(emptyList())
+                if (it is DataResultException) {
+                    mProjectSort.emit(UiState.Failed(it.message))
+                } else {
+                    mProjectSort.emit(UiState.Exception(it))
+                }
             }.collectLatest {
-                mProjectSort.emit(it)
+                mProjectSort.emit(UiState.Success(it))
             }
         }
     }

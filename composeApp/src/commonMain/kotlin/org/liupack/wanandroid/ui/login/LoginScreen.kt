@@ -1,5 +1,7 @@
 package org.liupack.wanandroid.ui.login
 
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.koin.koinViewModel
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.transition.NavTransition
 import org.liupack.wanandroid.common.Logger
 import org.liupack.wanandroid.composables.IconBackButton
 import org.liupack.wanandroid.composables.LoadingDialog
@@ -44,7 +47,12 @@ import org.liupack.wanandroid.model.entity.UserInfoData
 import org.liupack.wanandroid.router.Router
 
 fun RouteBuilder.loginScreen(navigator: Navigator) {
-    scene(Router.Login.path) {
+    scene(
+        route = Router.Login.path, navTransition = NavTransition(
+            createTransition = expandHorizontally(),
+            destroyTransition = shrinkHorizontally(),
+        )
+    ) {
         LoginScreen(navigator = navigator)
     }
 }

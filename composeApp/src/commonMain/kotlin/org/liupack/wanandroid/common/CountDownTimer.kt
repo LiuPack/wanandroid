@@ -1,6 +1,7 @@
 package org.liupack.wanandroid.common
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +21,7 @@ fun rememberCountDownTimer(
     }
 }
 
+@Stable
 class CountDownTimer(private val duration: Int, private val coroutineScope: CoroutineScope) {
     private val mCurrentTime = MutableStateFlow(duration)
     val currentTimer = mCurrentTime.asStateFlow()
