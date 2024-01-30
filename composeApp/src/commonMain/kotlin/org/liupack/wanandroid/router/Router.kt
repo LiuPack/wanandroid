@@ -58,4 +58,7 @@ sealed class Router(val path: String) {
 
     @Serializable
     data object UserAddShared : Router("/user_add_shared")
+
+    @Serializable
+    data object OpenSource : Router("/open_source")
 }

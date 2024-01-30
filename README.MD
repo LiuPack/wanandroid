@@ -30,3 +30,14 @@ To run the application on iPhone device/simulator:
   use [Kotlin Multiplatform Mobile plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile)
   for Android Studio
 
+### AboutLibraries
+
+- AboutLibraries
+  run  `./gradlew composeApp:exportLibraryDefinitions -PaboutLibraries.exportPath=src/commonMain/resources/`
+  aboutlibraries.json create in `src/commonMain/resources/`
+
+### Screen
+
+[Android](composeApp/screen/android_app.png)
+[iOS](composeApp/screen/ios_app.png)
+[MacDesktop](composeApp/screen/mac_desktop.png)

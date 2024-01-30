@@ -10,6 +10,7 @@ import org.liupack.wanandroid.ui.coin_count_ranking.CoinCountRankingViewModel
 import org.liupack.wanandroid.ui.home.HomeViewModel
 import org.liupack.wanandroid.ui.login.LoginViewModel
 import org.liupack.wanandroid.ui.main.MainViewModel
+import org.liupack.wanandroid.ui.open_source.OpenSourceViewModel
 import org.liupack.wanandroid.ui.project.ProjectViewModel
 import org.liupack.wanandroid.ui.project.child.ProjectListViewModel
 import org.liupack.wanandroid.ui.register.RegisterViewModel
@@ -47,4 +48,5 @@ val appModule = module {
     factory { UserFavoriteViewModel(get(), get()) }
     factory { UserSharedViewModel(get()) }
     factory { UserAddSharedViewModel(get()) }
+    factory { OpenSourceViewModel() }
 }

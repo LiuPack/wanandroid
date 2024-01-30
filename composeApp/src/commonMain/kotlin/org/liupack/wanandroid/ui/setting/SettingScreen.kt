@@ -3,12 +3,16 @@ package org.liupack.wanandroid.ui.setting
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
@@ -45,6 +50,12 @@ fun RouteBuilder.settingScreen(navigator: Navigator) {
             backClick = { navigator.goBack() },
             onSystemChange = { viewModel.saveSystemThemeMode(it) },
             onDarkChange = { viewModel.saveDarkTheme(it) },
+            onOpenClick = {
+                navigator.navigate(
+                    route = Router.OpenSource.path,
+                    options = NavOptions(launchSingleTop = true)
+                )
+            }
         )
     }
 }
@@ -54,7 +65,8 @@ fun RouteBuilder.settingScreen(navigator: Navigator) {
 fun SettingScreen(
     backClick: () -> Unit = {},
     onSystemChange: (ThemeMode) -> Unit,
-    onDarkChange: (ThemeMode) -> Unit
+    onDarkChange: (ThemeMode) -> Unit,
+    onOpenClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -76,7 +88,8 @@ fun SettingScreen(
             SettingContent(
                 paddingValues = paddingValues,
                 onSystemChange = onSystemChange,
-                onDarkChange = onDarkChange
+                onDarkChange = onDarkChange,
+                onOpenClick = onOpenClick
             )
         },
     )
@@ -86,7 +99,8 @@ fun SettingScreen(
 private fun SettingContent(
     paddingValues: PaddingValues,
     onSystemChange: (ThemeMode) -> Unit,
-    onDarkChange: (ThemeMode) -> Unit
+    onDarkChange: (ThemeMode) -> Unit,
+    onOpenClick: () -> Unit,
 ) {
     var themeMode by LocalThemeMode.current
     LazyColumn(
@@ -142,6 +156,18 @@ private fun SettingContent(
                         showPinned = !showPinned
                         settings.putBoolean(Constants.showPinned, showPinned)
                     })
+                })
+        }
+        item {
+            ListItem(modifier = Modifier.fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface).clickable {
+                    onOpenClick.invoke()
+                },
+                headlineContent = {
+                    Text("开源项目")
+                },
+                trailingContent = {
+                    Icon(Icons.Outlined.KeyboardArrowRight, null)
                 })
         }
     }

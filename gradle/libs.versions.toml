@@ -22,6 +22,7 @@ precompose = "1.5.10"
 webview-multiplatform = "1.8.4"
 kcef-tool = "1.1.0"
 build-config = "5.3.5"
+about-libraries = "11.1.0-b01"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
@@ -51,6 +52,7 @@ precompose-viewmodel = { module = "moe.tlaster:precompose-viewmodel", version.re
 precompose-koin = { module = "moe.tlaster:precompose-koin", version.ref = "precompose" }
 webview-multiplatform = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "webview-multiplatform" }
 kcef-tool = { module = "dev.datlag.tooling:tooling", version.ref = "kcef-tool" }
+about-library-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "about-libraries" }
 
 [plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -58,3 +60,4 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
+about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }

@@ -39,6 +39,7 @@ import org.liupack.wanandroid.router.Router
 import org.liupack.wanandroid.ui.coin_count_ranking.coinCountRankingScreen
 import org.liupack.wanandroid.ui.home.homeScreen
 import org.liupack.wanandroid.ui.login.loginScreen
+import org.liupack.wanandroid.ui.open_source.openSource
 import org.liupack.wanandroid.ui.project.projectScreen
 import org.liupack.wanandroid.ui.register.registerScreen
 import org.liupack.wanandroid.ui.setting.settingScreen
@@ -173,5 +174,6 @@ private fun WindowContent(navigator: Navigator, modifier: Modifier = Modifier) {
             userFavoriteScreen(navigator = navigator)
             userSharedScreen(navigator = navigator)
             userAddSharedScreen(navigator = navigator)
+            openSource(navigator = navigator)
         })
 }

@@ -1,4 +1,6 @@
+import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -6,6 +8,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.build.config)
+    alias(libs.plugins.about.libraries)
 }
 
 buildConfig {
@@ -63,6 +66,7 @@ kotlin {
             implementation(libs.precompose.viewmodel)
             implementation(libs.webview.multiplatform)
             implementation(libs.kcef.tool)
+            implementation(libs.about.library.core)
         }
 
         commonTest.dependencies {
@@ -167,4 +171,12 @@ afterEvaluate {
             jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
         }
     }
+}
+
+configure<AboutLibrariesExtension> {
+    registerAndroidTasks = false
+}
+
+tasks.withType(KotlinCompile::class.java) {
+    dependsOn("exportLibraryDefinitions")
 }
