@@ -32,9 +32,8 @@ To run the application on iPhone device/simulator:
 
 ### AboutLibraries
 
-- AboutLibraries
-  run  `./gradlew composeApp:exportLibraryDefinitions -PaboutLibraries.exportPath=src/commonMain/resources/`
-  aboutlibraries.json create in `src/commonMain/resources/`
+- run  `./gradlew composeApp:exportLibraryDefinitions -PaboutLibraries.exportPath=src/commonMain/resources/`
+- parse `src/commonMain/resources/aboutlibraries.json`
 
 ### Screen
 

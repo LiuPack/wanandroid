@@ -1,11 +1,13 @@
 [versions]
-kotlin = "1.9.21"
+kotlin = "1.9.22"
 agp = "8.2.2"
-compose = "1.5.11"
+compose = "1.5.12"
 androidx-appcompat = "1.6.1"
 androidx-activityCompose = "1.8.2"
-compose-uitooling = "1.5.4"
+compose-uitooling = "1.6.0"
+compose-compiler = "1.5.8"
 coil = "3.0.0-alpha03"
+material3 = "1.2.0-rc01"
 napier = "2.7.1"
 kotlinx-coroutines = "1.7.3"
 ktor = "2.3.7"
@@ -27,6 +29,7 @@ about-libraries = "11.1.0-b01"
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 compose-uitooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-uitooling" }
 coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }

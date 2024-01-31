@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -53,6 +52,7 @@ import org.liupack.wanandroid.composables.ArticleItem
 import org.liupack.wanandroid.composables.CustomPullToRefreshContent
 import org.liupack.wanandroid.composables.PagingFullLoadLayout
 import org.liupack.wanandroid.composables.pagingFooter
+import org.liupack.wanandroid.composables.rememberLazyListState
 import org.liupack.wanandroid.model.UiState.Companion.isLoginExpired
 import org.liupack.wanandroid.model.UiStateSuccess
 import org.liupack.wanandroid.model.entity.HomeArticleItemData
@@ -72,15 +72,13 @@ fun RouteBuilder.homeScreen(navigator: Navigator) {
 fun HomeScreen(navigator: Navigator, backStackEntry: BackStackEntry) {
     BackHandler { exitApp() }
     val viewModel = koinViewModel(HomeViewModel::class)
-    val combine by viewModel.combineData.collectAsState()
-    val pinned = combine.first
-    val articleState = combine.second.collectAsLazyPagingItems()
-    val lazyListState = rememberLazyListState()
+    val pinned by viewModel.pinned.collectAsState(emptyList())
+    val articleState = viewModel.articles.collectAsLazyPagingItems()
+    val lazyListState = articleState.rememberLazyListState()
     val favoriteState by viewModel.favoriteState.collectAsState(null)
     var isFavoriteAction by remember { mutableStateOf(false) }
     val refreshLayoutState = rememberRefreshLayoutState {
         isFavoriteAction = false
-        viewModel.dispatch(HomeAction.Refresh)
         articleState.refresh()
     }
     favoriteState?.let {
@@ -90,13 +88,11 @@ fun HomeScreen(navigator: Navigator, backStackEntry: BackStackEntry) {
                     Router.Login.path, NavOptions(launchSingleTop = true)
                 )
                 if (result == true) {
-                    viewModel.dispatch(HomeAction.Refresh)
                     articleState.refresh()
                 }
             }
             if (favoriteState is UiStateSuccess) {
                 isFavoriteAction = true
-                viewModel.dispatch(HomeAction.Refresh)
                 articleState.refresh()
             }
         }

@@ -79,6 +79,8 @@ kotlin {
             implementation(libs.compose.uitooling)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
+            // 修复在 compose-multiplatform 1.5.12中 Android 里的CircularProgressIndicator导致的闪退
+            implementation(libs.androidx.material3)
         }
 
         jvmMain.dependencies {
@@ -120,7 +122,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.uitooling.get()
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 }
 
